@@ -3,12 +3,12 @@ package com.eltech.sh.controller;
 import com.eltech.sh.model.Person;
 import com.eltech.sh.repository.PersonRepository;
 import com.eltech.sh.service.VKService;
+import com.vk.api.sdk.objects.users.UserXtrCounters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -23,13 +23,12 @@ public class PersonController {
         this.personRepository = personRepository;
     }
 
-    //FIXME fix hardcode
+    //TODO move getUserMethod in VkService
     @GetMapping("/persons/{personId}/friends")
-    List<Person> getPersonFriends(@PathVariable("personId") String id, HttpServletRequest request) {
-        String token = (String) request.getSession().getAttribute("access_token");
-        List<Person> friends = vkService.findFriend(id, token);
-
-        Person user = new Person("Serezha", "Karpunin");
+    List<Person> getPersonFriends(@PathVariable("personId") String id) {
+        List<Person> friends = vkService.findPersonFriends(id);
+        UserXtrCounters userById = vkService.getUserById(id);
+        Person user = new Person(userById.getFirstName(), userById.getLastName());
         friends.forEach(user::friendOf);
         personRepository.save(user);
         return friends;
