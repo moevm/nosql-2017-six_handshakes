@@ -1,92 +1,89 @@
 package com.eltech.sh.service;
 
+import com.eltech.sh.configuration.VkCredentialsConfiguration;
 import com.eltech.sh.model.Person;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vk.api.sdk.actions.Friends;
+import com.vk.api.sdk.client.VkApiClient;
+import com.vk.api.sdk.client.actors.UserActor;
+import com.vk.api.sdk.exceptions.ApiException;
+import com.vk.api.sdk.exceptions.ClientException;
+import com.vk.api.sdk.objects.UserAuthResponse;
+import com.vk.api.sdk.objects.users.UserXtrCounters;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.Scanner;
 
-import com.vk.api.sdk.client.ClientResponse;
-import com.vk.api.sdk.client.TransportClient;
-import com.vk.api.sdk.exceptions.ApiException;
-import com.vk.api.sdk.exceptions.ApiWallLinksForbiddenException;
-import com.vk.api.sdk.exceptions.ClientException;
-import com.vk.api.sdk.httpclient.HttpTransportClient;
-import com.vk.api.sdk.client.VkApiClient;
-import com.vk.api.sdk.actions.Friends;
-import com.vk.api.sdk.client.actors.UserActor;
-import com.vk.api.sdk.objects.users.UserXtrCounters;
 
 @Service
 public class VKService {
 
-    //TODO Add VK API support
-    List<Person> getPersonFriends(String id) {
+    private final VkCredentialsConfiguration configuration;
+    private final VkApiClient vkApiClient;
+    private final Friends friends;
+
+    @Autowired
+    public VKService(VkCredentialsConfiguration configuration, VkApiClient vkApiClient, Friends friends) {
+        this.configuration = configuration;
+        this.vkApiClient = vkApiClient;
+        this.friends = friends;
+    }
+
+    private UserActor getUserActor(String token){
+       return new UserActor(configuration.getAppId(), token);
+    }
+
+    private UserXtrCounters getUserById(String userId, String token) {
+        try {
+            List<UserXtrCounters> list = vkApiClient.users().get(getUserActor(token)).userIds(userId).execute();
+            return list.get(0);
+        } catch (ApiException | ClientException e) {
+            e.printStackTrace();
+        }
         return null;
     }
-    public static ClientResponse findFriend(String user_Id)
-    {
-        TransportClient transportClient = HttpTransportClient.getInstance();
-        VkApiClient vk = new VkApiClient(transportClient);
 
-        Integer USS_ID=6183115;
-        String TOKEN="ecdc6e6b4d6bd772e59c22a380d57d449f1e1a31757a8fc59e8d625faf4b76225a30492eec33cb5297529";
-
-        UserActor actor = new UserActor(USS_ID, TOKEN);
-        Friends friends = new Friends(vk);
-        ClientResponse resp = null;
+    public List<Person> findFriend(String userStringId, String token) {
+        Integer userId = getUserById(userStringId, token).getId();
+        String resp = null;
         try {
-            List<UserXtrCounters> list_acc = vk.users().get(actor).userIds(user_Id).execute();
-            //String fr = friends.get(actor).listId(list_acc.get(0).getId()).unsafeParam("fields", "city,domain").unsafeParam("user_id", list_acc.get(0).getId()).executeAsString();
-            resp= friends.get(actor).listId(list_acc.get(0).getId()).unsafeParam("fields", "city,domain").unsafeParam("user_id", list_acc.get(0).getId()).executeAsRaw();
-            // System.out.print(fr);
-        }
-        catch (ApiWallLinksForbiddenException e) {
-            return resp;
-            // Links posting is prohibited
-        } catch (ApiException e) {
-            return resp;
-            // Business logic error
+            resp = friends.get(getUserActor(token)).listId(userId).unsafeParam("fields", "city,domain").unsafeParam("user_id", userId).executeAsRaw().getContent();
         } catch (ClientException e) {
-            return resp;
-            // Transport layer error
+            e.printStackTrace();
         }
-        return resp;
+
+        //FIXME fix this hardcode
+        resp = resp.replace("{\"response\":{\"count\":60,\"items\":", "");
+        resp = resp.replace("]}}", "]");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<Person> parsedFriends = null;
+        try {
+            parsedFriends = objectMapper.readValue(resp, new TypeReference<List<Person>>(){});
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return parsedFriends;
     }
-    public static void parsingFromJson(String[] args)
-    {
 
-        System.out.print("Введите id пользователя, друзей которого вы хотите найти: ");
-        Scanner in = new Scanner(System.in);
-        String input_id = in.nextLine();
 
-        ClientResponse response = findFriend(input_id);
-        Integer status = response.getStatusCode();
-
-        if (status == 200) {
-            JSONParser parser   = new JSONParser();
-            try
-            {
-                JSONObject obj  = (JSONObject) parser.parse(response.getContent());
-                JSONArray array = new JSONArray();
-                array.add(obj.get("response"));
-                JSONObject unicPost  = null;
-                for (int i=0; i < array.size(); i++)
-                {
-                    unicPost = (JSONObject) array.get(i);
-                    System.out.println(unicPost.get("text"));
-                }
-                System.out.print(array);
-
-            } catch (ParseException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
+    public String getAccessToken(String code) {
+        UserAuthResponse authResponse = null;
+        try {
+            authResponse = vkApiClient.oauth()
+                    .userAuthorizationCodeFlow(
+                            configuration.getAppId(),
+                            configuration.getClientSecret(),
+                            configuration.getRedirectUri(),
+                            code)
+                    .execute();
+        } catch (ApiException | ClientException e) {
+            e.printStackTrace();
         }
-
+        return authResponse.getAccessToken();
     }
 }
