@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "css-loader": "^0.28.7",
+    "ejs-loader": "^0.3.0",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "style-loader": "^0.18.2",

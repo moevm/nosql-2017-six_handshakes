@@ -1,5 +1,5 @@
 const path = require('path');
-const HtmlPlugin    = require('html-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const offset = '../back-end/src/main/resources/static';
 module.exports = {
     entry: './index.js',
@@ -21,10 +21,8 @@ module.exports = {
         ]
     },
     plugins: [
-        new HtmlPlugin({
-            title: 'Test APP',
-            filename: 'index.html',
-            inject: 'body'
+        new HtmlWebpackPlugin({
+            template: '!!ejs-loader!index-template.ejs'
         })
     ]
 };
