@@ -5,9 +5,7 @@ import com.eltech.sh.repository.PersonRepository;
 import com.eltech.sh.service.VKService;
 import com.vk.api.sdk.objects.users.UserXtrCounters;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -34,5 +32,9 @@ public class PersonController {
         return friends;
     }
 
-
+    //TODO Now this method just redirects to getPersonFriend. We need to add some logic instead of it
+    @PostMapping("/find")
+    List<Person> checkSixHandshakes(@RequestParam("from") String fromId, @RequestParam("to") String toId) {
+        return getPersonFriends(fromId);
+    }
 }
