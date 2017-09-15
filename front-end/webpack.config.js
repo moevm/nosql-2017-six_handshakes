@@ -1,7 +1,10 @@
+const path = require('path');
+const HtmlPlugin    = require('html-webpack-plugin');
+const offset = '../back-end/src/main/resources/static';
 module.exports = {
     entry: './index.js',
     output: {
-        path: __dirname,
+        path: path.resolve(__dirname, offset),
         filename: "bundle.js"
     },
     module: {
@@ -16,5 +19,12 @@ module.exports = {
                 }
             }
         ]
-    }
+    },
+    plugins: [
+        new HtmlPlugin({
+            title: 'Test APP',
+            filename: 'index.html',
+            inject: 'body'
+        })
+    ]
 };
