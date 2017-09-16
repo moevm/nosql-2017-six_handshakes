@@ -1,8 +1,6 @@
 package com.eltech.sh.controller;
 
 import com.eltech.sh.model.Person;
-import com.eltech.sh.model.RequestStatus;
-import com.eltech.sh.repository.PersonRepository;
 import com.eltech.sh.service.HandshakeService;
 import com.eltech.sh.service.VKService;
 import com.vk.api.sdk.objects.users.UserXtrCounters;
@@ -11,7 +9,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 @RestController
 public class PersonController {
@@ -21,7 +18,7 @@ public class PersonController {
     private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Autowired
-    public PersonController(VKService vkService, SimpMessagingTemplate simpMessagingTemplate) {
+    public PersonController(VKService vkService, SimpMessagingTemplate simpMessagingTemplate, HandshakeService handshakeService) {
         this.vkService = vkService;
         this.handshakeService = handshakeService;
         this.simpMessagingTemplate = simpMessagingTemplate;
@@ -32,7 +29,7 @@ public class PersonController {
     public Person me(HttpServletRequest request) {
         String id = (String) request.getSession().getAttribute("current_user_id");
         UserXtrCounters userById = vkService.getUserById(id);
-        return new Person(userById.getFirstName(), userById.getLastName());
+        return new Person(vkService.getOriginalId(id), userById.getFirstName(), userById.getLastName());
     }
 
     @PostMapping("/find")
