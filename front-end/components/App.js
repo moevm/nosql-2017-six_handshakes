@@ -2,6 +2,7 @@ import {UserInfo} from "./UserInfo";
 import React from "react";
 import {fetchUser} from "../actions/index";
 import {connect} from 'react-redux';
+import {Form} from "./Form";
 
 class App extends React.Component {
     componentDidMount() {
@@ -11,6 +12,7 @@ class App extends React.Component {
     render() {
         return (<div>
             <UserInfo user = {this.props.user}/>
+            <Form/>
         </div>)
     }
 }
