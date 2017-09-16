@@ -14,4 +14,8 @@ public interface PersonRepository extends GraphRepository<Person> {
             "RETURN path")
     Iterable<Person> findPathByQuery(@Param("from") Integer from, @Param("to") Integer to);
 
+    @Query("MATCH (:Person{vkId:{personId}})-->(friends) " +
+            "RETURN friends")
+    Iterable<Person> findFriendsById(@Param("personId") Integer id);
+
 }
