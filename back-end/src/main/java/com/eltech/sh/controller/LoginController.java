@@ -1,6 +1,7 @@
 package com.eltech.sh.controller;
 
 import com.eltech.sh.service.VKService;
+import com.vk.api.sdk.objects.UserAuthResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,8 +22,9 @@ public class LoginController {
 
     @GetMapping("/callback")
     public void callback(HttpServletRequest request, HttpServletResponse response) {
-        String accessToken = vkService.getAccessToken(request.getParameter("code"));
-        request.getSession().setAttribute("access_token", accessToken);
+        UserAuthResponse authInfo = vkService.getAuthInfo(request.getParameter("code"));
+        request.getSession().setAttribute("access_token", authInfo.getAccessToken());
+        request.getSession().setAttribute("current_user_id", authInfo.getUserId().toString());
 
         try {
             response.sendRedirect("/");

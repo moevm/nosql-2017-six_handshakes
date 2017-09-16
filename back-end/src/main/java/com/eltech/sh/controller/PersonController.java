@@ -7,6 +7,7 @@ import com.vk.api.sdk.objects.users.UserXtrCounters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -19,6 +20,14 @@ public class PersonController {
     public PersonController(VKService vkService, PersonRepository personRepository) {
         this.vkService = vkService;
         this.personRepository = personRepository;
+    }
+
+
+    @GetMapping("/me")
+    public Person me(HttpServletRequest request) {
+        String id = (String) request.getSession().getAttribute("current_user_id");
+        UserXtrCounters userById = vkService.getUserById(id);
+        return new Person(userById.getFirstName(), userById.getLastName());
     }
 
     //TODO move getUserMethod in VkService

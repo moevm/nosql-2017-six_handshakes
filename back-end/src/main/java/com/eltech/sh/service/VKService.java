@@ -2,7 +2,6 @@ package com.eltech.sh.service;
 
 import com.eltech.sh.configuration.VkCredentialsConfiguration;
 import com.eltech.sh.model.Person;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -79,7 +78,7 @@ public class VKService {
     }
 
 
-    public String getAccessToken(String code) {
+    public UserAuthResponse getAuthInfo(String code) {
         UserAuthResponse authResponse = null;
         try {
             authResponse = vkApiClient.oauth()
@@ -92,6 +91,6 @@ public class VKService {
         } catch (ApiException | ClientException e) {
             e.printStackTrace();
         }
-        return authResponse.getAccessToken();
+        return authResponse;
     }
 }

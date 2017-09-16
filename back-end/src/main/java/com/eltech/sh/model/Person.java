@@ -19,10 +19,7 @@ public class Person {
     @JsonIgnore
     private Long id;
 
-    @JsonProperty("first_name")
     private String firstName;
-
-    @JsonProperty("last_name")
     private String lastName;
 
     public Person() {
@@ -33,18 +30,22 @@ public class Person {
         this.lastName = lastName;
     }
 
+    @JsonProperty("firstName")
     public String getFirstName() {
         return firstName;
     }
 
+    @JsonProperty("first_name")
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
+    @JsonProperty("lastName")
     public String getLastName() {
         return lastName;
     }
 
+    @JsonProperty("last_name")
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
@@ -57,8 +58,6 @@ public class Person {
     @Relationship(type = "FRIEND", direction = Relationship.UNDIRECTED)
     @JsonIgnore
     public Set<Person> friends;
-
-
 
     public void friendOf(Person person) {
         if (friends == null) {
