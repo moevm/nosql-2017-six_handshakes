@@ -24,5 +24,8 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: '!!ejs-loader!index-template.ejs'
         })
-    ]
+    ],
+    node: {
+        net: 'empty'
+    }
 };
