@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
-
+import org.neo4j.ogm.annotation.Index;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,15 +19,29 @@ public class Person {
     @JsonIgnore
     private Long id;
 
+    @JsonProperty("id")
+    @Index(unique=true,primary = true)
+    private Integer vkId;
+
+
     private String firstName;
     private String lastName;
 
     public Person() {
     }
 
-    public Person(String firstName, String lastName) {
+    public Person(Integer vkId, String firstName, String lastName) {
+        this.vkId = vkId;
         this.firstName = firstName;
         this.lastName = lastName;
+    }
+
+    public Integer getVkId() {
+        return vkId;
+    }
+
+    public void setVkId(Integer vkId) {
+        this.vkId = vkId;
     }
 
     @JsonProperty("firstName")

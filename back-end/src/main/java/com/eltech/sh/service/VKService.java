@@ -93,4 +93,8 @@ public class VKService {
         }
         return authResponse;
     }
+
+    public Integer getOriginalId(String id){
+      return getUserById(id).getId();
+    }
 }
