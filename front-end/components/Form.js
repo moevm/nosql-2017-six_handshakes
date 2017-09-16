@@ -1,4 +1,6 @@
 import React from "react";
+
+//TODO send request via fetch
 export const Form = () => (
     <form name="mainForm" method="post" action="/find">
         <div>

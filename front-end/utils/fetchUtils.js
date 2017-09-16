@@ -8,7 +8,7 @@ export let RequestParamsFactory = {
             }
         }
     },
-
+    //TODO add function for cookie retrieving
     POST: (payload = {}) => {
         return {
             method: 'POST',
@@ -31,6 +31,7 @@ export function fetchPost(url, dispatch, onSuccess, onFailure, payload = {}) {
     return fetchWrapper(url, RequestParamsFactory.POST(payload), dispatch, onSuccess, onFailure);
 }
 
+//TODO use isomorphic-fetch or fetch-polyfill
 function fetchWrapper(url, params, dispatch, onSuccess, onFailure) {
     return fetch(url, params)
         .then(
