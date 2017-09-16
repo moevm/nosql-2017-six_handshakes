@@ -29,7 +29,7 @@ public class HandshakeService {
     protected void savePersonFriends(String id) {
         List<Person> friends = vkService.findPersonFriends(id);
         UserXtrCounters userById = vkService.getUserById(id);
-        Person user = new Person(userById.getFirstName(), userById.getLastName());
+        Person user = new Person(userById.getId().longValue(), userById.getFirstName(), userById.getLastName());
         friends.forEach(user::friendOf);
         personRepository.save(user);
     }
