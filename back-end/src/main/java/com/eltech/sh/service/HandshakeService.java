@@ -20,10 +20,11 @@ public class HandshakeService {
         this.personRepository = personRepository;
     }
 
-    public List<Person> checkSixHandshakes(String from, String to) {
+    public Iterable<Person> checkSixHandshakes(String from, String to) {
         savePersonFriends(from);
         savePersonFriends(to);
-        return (List<Person>) personRepository.findAll();
+        //return (List<Person>) personRepository.findAll();
+        return personRepository.findPathByQuery(43787759L,211604452L);
     }
 
     protected void savePersonFriends(String id) {

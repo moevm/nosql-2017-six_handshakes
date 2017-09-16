@@ -29,6 +29,8 @@ public class Person {
     @JsonProperty("last_name")
     private String lastName;
 
+   // boolean visited = false;
+
     public Person() {
     }
 
