@@ -12,6 +12,6 @@ public interface PersonRepository extends GraphRepository<Person> {
             "MATCH (toId {vkId:{to}}) " +
             "MATCH path = shortestPath( (fromId)-[:FRIEND*..5]-(toId) ) " +
             "RETURN path")
-    Iterable<Person> findPathByQuery(@Param("from") Long from, @Param("to") Long to);
+    Iterable<Person> findPathByQuery(@Param("from") Integer from, @Param("to") Integer to);
 
 }

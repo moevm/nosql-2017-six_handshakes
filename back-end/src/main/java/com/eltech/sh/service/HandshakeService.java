@@ -21,16 +21,17 @@ public class HandshakeService {
     }
 
     public Iterable<Person> checkSixHandshakes(String from, String to) {
+        //for (int i=0; i<)
         savePersonFriends(from);
         savePersonFriends(to);
-        //return (List<Person>) personRepository.findAll();
-        return personRepository.findPathByQuery(43787759L,211604452L);
+        Iterable <Person> path = personRepository.findPathByQuery(vkService.getOriginalId(from),vkService.getOriginalId(to));
+        return path;
     }
 
     protected void savePersonFriends(String id) {
         List<Person> friends = vkService.findPersonFriends(id);
         UserXtrCounters userById = vkService.getUserById(id);
-        Person user = new Person(userById.getId().longValue(), userById.getFirstName(), userById.getLastName());
+        Person user = new Person(userById.getId(), userById.getFirstName(), userById.getLastName());
         friends.forEach(user::friendOf);
         personRepository.save(user);
     }
