@@ -7,28 +7,11 @@ export let RequestParamsFactory = {
                 'Access-Control-Allow-Origin': '*'
             }
         }
-    },
-    //TODO add function for cookie retrieving
-    POST: (payload = {}) => {
-        return {
-            method: 'POST',
-            body: JSON.stringify(payload),
-            credentials: 'include',
-            dataType: "json",
-            headers: {
-                'Content-Type': 'application/json',
-                'X-XSRF-TOKEN': getCookie('XSRF-TOKEN')
-            }
-        }
-    },
+    }
 };
 
 export function fetchGet(url, dispatch, onSuccess, onFailure) {
     return fetchWrapper(url, RequestParamsFactory.GET(), dispatch, onSuccess, onFailure);
-}
-
-export function fetchPost(url, dispatch, onSuccess, onFailure, payload = {}) {
-    return fetchWrapper(url, RequestParamsFactory.POST(payload), dispatch, onSuccess, onFailure);
 }
 
 //TODO use isomorphic-fetch or fetch-polyfill

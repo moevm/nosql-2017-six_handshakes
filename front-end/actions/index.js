@@ -7,7 +7,7 @@ export const setUser = user => {
 };
 
 //TODO replace console log by some action
-function fetchRequest(){
+function fetchRequest() {
     console.log('Send request');
     return {
         type: 'NONE'
@@ -52,7 +52,33 @@ export function fetchUser() {
 const SERVER_URL = 'http://localhost:8080';
 
 
+export function handleFormSubmit(values, dispatch, props) {
+    fetchGet(
+        `${SERVER_URL}/find?from=${values.from}&to=${values.to}`,
+        dispatch,
+        fetchSearchSuccess,
+        fetchSearchFailure
+    );
+}
 
 
+//TODO replace console log by some action
+function fetchSearchSuccess(json) {
+    console.log('search finished');
+    console.log(json);
+    return {
+        type: 'NONE'
+    }
+}
 
-
+//TODO replace console log by some action
+function fetchSearchFailure(errorMessage) {
+    console.log('search failed');
+    return {
+        type: 'NONE'
+    }
+    // return dispatch => {
+    //     dispatch(fetchFailure());
+    //     dispatch(error({message: errorMessage}));
+    // }
+}
