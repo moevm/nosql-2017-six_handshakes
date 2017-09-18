@@ -27,5 +27,6 @@ dependencies {
             "org.springframework.boot:spring-boot-starter-web",
             "com.vk.api:sdk:0.5.8",
             "com.googlecode.json-simple:json-simple:1.1.1",
-            "org.springframework.boot:spring-boot-starter-websocket")
+           // "org.springframework.boot:spring-boot-starter-websocket"
+    )
 }

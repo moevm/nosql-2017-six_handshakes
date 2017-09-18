@@ -29,6 +29,8 @@ public class VKService {
     private final Friends friends;
     private final ObjectMapper objectMapper;
 
+    int requests = 5;
+
     @Autowired
     public VKService(VkCredentialsConfiguration configuration, VkApiClient vkApiClient, Friends friends, ObjectMapper objectMapper, HttpSession session) {
         this.configuration = configuration;
@@ -43,8 +45,12 @@ public class VKService {
     }
 
 
-
     public UserXtrCounters getUserById(String userId) {
+        try {
+            Thread.sleep(400);
+        } catch (InterruptedException e1) {
+            e1.printStackTrace();
+        }
         try {
             List<UserXtrCounters> list = vkApiClient.users().get(getUserActor()).userIds(userId).execute();
             return list.get(0);
@@ -66,12 +72,28 @@ public class VKService {
 
 
     public List<Person> findPersonFriends(String userStringId) {
+     /* //  requests--;
+        if (true) try {
+            requests = 5;
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        */
+
         Integer userId = getUserById(userStringId).getId();
         String response = null;
         try {
             response = friends.get(getUserActor()).listId(userId).unsafeParam("fields", "city,domain").unsafeParam("user_id", userId).executeAsRaw().getContent();
         } catch (ClientException e) {
             e.printStackTrace();
+          /*  try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e1) {
+
+                e1.printStackTrace();
+            } */
+            findPersonFriends(userStringId);
         }
 
         List<Person> convertedFriends = null;
@@ -104,7 +126,7 @@ public class VKService {
         return authResponse;
     }
 
-    public Integer getOriginalId(String id){
-      return getUserById(id).getId();
+    public Integer getOriginalId(String id) {
+        return getUserById(id).getId();
     }
 }

@@ -5,7 +5,7 @@ import com.eltech.sh.service.HandshakeService;
 import com.eltech.sh.service.VKService;
 import com.vk.api.sdk.objects.users.UserXtrCounters;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+//import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,13 +15,13 @@ public class PersonController {
 
     private final VKService vkService;
     private final HandshakeService handshakeService;
-    private final SimpMessagingTemplate simpMessagingTemplate;
+ //   private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Autowired
-    public PersonController(VKService vkService, SimpMessagingTemplate simpMessagingTemplate, HandshakeService handshakeService) {
+    public PersonController(VKService vkService, /*SimpMessagingTemplate simpMessagingTemplate,*/ HandshakeService handshakeService) {
         this.vkService = vkService;
         this.handshakeService = handshakeService;
-        this.simpMessagingTemplate = simpMessagingTemplate;
+      //  this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
 
@@ -32,7 +32,7 @@ public class PersonController {
         return new Person(vkService.getOriginalId(id), userById.getFirstName(), userById.getLastName());
     }
 
-    @PostMapping("/find")
+    @GetMapping("/find")
     Iterable<Person> checkSixHandshakes(@RequestParam("from") String fromId, @RequestParam("to") String toId) {
         return handshakeService.checkSixHandshakes(fromId,toId);
     }
