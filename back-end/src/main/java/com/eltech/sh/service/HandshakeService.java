@@ -39,7 +39,7 @@ public class HandshakeService {
             return path;
         } else {
             findNextLevelFriends(origIdFrom, origIdTo, 1);
-            findNextLevelFriends(origIdFrom, origIdTo, 2);
+            findNextLevelFriends(origIdTo, origIdFrom, 1);
             return personRepository.findPathByQuery(origIdFrom, origIdTo);
         }
     }
