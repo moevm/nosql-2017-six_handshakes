@@ -33,25 +33,11 @@ public class HandshakeService {
         toVisit.add(origIdFrom);
         toVisit.add(origIdTo);
 
-        //findFriends(origIdFrom);
-        //findFriends(origIdTo);
-
-        //if targets already friends
-        //Iterable<Person> path = personRepository.findPathByQuery(origIdFrom, origIdTo);
-
-        //if (path.iterator().hasNext()) {
-        //  return path;
-        //} else {
-        // findNextLevelFriends(origIdFrom, origIdTo, 1);
-        //findNextLevelFriends(origIdTo, origIdFrom, 1);
         Iterable<Person> path = createGraph(origIdFrom, origIdTo);
         return path;
-        // return personRepository.findPathByQuery(origIdFrom, origIdTo);
-        //}
     }
 
     protected Iterable<Person> createGraph(int from, int to) {
-        // while (!toVisit.isEmpty() && level < 3) {
         Queue<Integer> nextLevel = new LinkedList<>();
 
         for (int i = 0; i < 3; i++) {
