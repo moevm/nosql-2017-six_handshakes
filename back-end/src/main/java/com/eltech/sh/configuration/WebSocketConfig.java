@@ -1,26 +1,24 @@
 package com.eltech.sh.configuration;
-/*
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 
-/*
-//@Configuration
-//@EnableWebSocketMessageBroker
+
+@Configuration
+@EnableWebSocketMessageBroker
 public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
-   // @Override
+    @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-       // config.enableSimpleBroker("/topic");
-       // config.setApplicationDestinationPrefixes("/ws");
+        config.enableSimpleBroker("/topic");
+        config.setApplicationDestinationPrefixes("/ws");
     }
 
-//    @Override
+    @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-       //registry.addEndpoint("/six-handshakes-websocket").withSockJS();
+       registry.addEndpoint("/six-handshakes-websocket").withSockJS();
     }
 
 }
-*/
