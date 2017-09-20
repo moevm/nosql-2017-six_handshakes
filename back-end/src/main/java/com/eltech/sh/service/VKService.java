@@ -42,6 +42,15 @@ public class VKService {
         return new UserActor(configuration.getAppId(), (String) session.getAttribute("access_token"));
     }
 
+    public Integer getOriginalId(String id) {
+        return getUserById(id).getId();
+    }
+
+    public Person getUserByStringId(String id){
+        UserXtrCounters userById = getUserById(id);
+        return new Person(userById.getId(), userById.getFirstName(), userById.getLastName());
+    }
+
 
     public UserXtrCounters getUserById(String userId) {
         try {
@@ -109,7 +118,5 @@ public class VKService {
         return authResponse;
     }
 
-    public Integer getOriginalId(String id) {
-        return getUserById(id).getId();
-    }
+
 }

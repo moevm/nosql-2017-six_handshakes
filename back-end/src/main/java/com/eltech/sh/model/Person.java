@@ -8,6 +8,7 @@ import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.Index;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,9 +21,8 @@ public class Person {
     private Long id;
 
     @JsonProperty("id")
-    @Index(unique=true,primary = true)
+    @Index(unique = true, primary = true)
     private Integer vkId;
-
 
     private String firstName;
     private String lastName;

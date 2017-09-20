@@ -23,7 +23,6 @@ public class FixedHandshakeService {
     public FixedHandshakeService(VKService vkService, PersonRepository personRepository) {
         this.vkService = vkService;
         this.personRepository = personRepository;
-
     }
 
     public Iterable<Person> checkSixHandshakes(String from, String to) {
@@ -39,7 +38,7 @@ public class FixedHandshakeService {
         return createGraph(origIdFrom, origIdTo);
     }
 
-    protected Iterable<Person> createGraph(int from, int to) {
+    private Iterable<Person> createGraph(int from, int to) {
         Queue<Integer> nextLevel = new LinkedList<>();
 
         for (int i = 0; i < 3; i++) {
@@ -79,7 +78,7 @@ public class FixedHandshakeService {
         return personRepository.findPathByQuery(from, to);
     }
 
-    protected List<Person> savePersonFriends(String id) {
+    private List<Person> savePersonFriends(String id) {
         UserXtrCounters userById = vkService.getUserById(id);
         Person user = new Person(userById.getId(), userById.getFirstName(), userById.getLastName());
 
