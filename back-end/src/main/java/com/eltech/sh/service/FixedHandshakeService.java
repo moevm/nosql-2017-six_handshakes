@@ -2,10 +2,8 @@ package com.eltech.sh.service;
 
 import com.eltech.sh.model.Person;
 import com.eltech.sh.repository.PersonRepository;
-import com.vk.api.sdk.objects.users.UserXtrCounters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -17,20 +15,21 @@ public class FixedHandshakeService {
     private final PersonRepository personRepository;
     private Set<Integer> visited;
     private Queue<Integer> toVisit;
-    private static final Logger logger = LoggerFactory.getLogger(FixedHandshakeService.class);
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Autowired
-    public FixedHandshakeService(VKService vkService, PersonRepository personRepository) {
+    public FixedHandshakeService(VKService vkService, PersonRepository personRepository, SimpMessagingTemplate simpMessagingTemplate) {
         this.vkService = vkService;
         this.personRepository = personRepository;
+        this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
     public Iterable<Person> checkSixHandshakes(String from, String to) {
         toVisit = new LinkedList<>();
         visited = new HashSet<>(10000);
 
-        Integer origIdFrom = vkService.getOriginalId(from);
-        Integer origIdTo = vkService.getOriginalId(to);
+        Integer origIdFrom = vkService.getUserByStringId(from).getVkId();
+        Integer origIdTo = vkService.getUserByStringId(to).getVkId();
 
         toVisit.add(origIdFrom);
         toVisit.add(origIdTo);
@@ -42,62 +41,52 @@ public class FixedHandshakeService {
         Queue<Integer> nextLevel = new LinkedList<>();
 
         for (int i = 0; i < 3; i++) {
-            logger.debug("ITERATION: " + i);
+            notify("STARTED ITERATION# " + i);
             while (!toVisit.isEmpty()) {
                 Integer cur = toVisit.poll();
-                logger.debug("POLLED ID: " + cur);
                 if (!visited.contains(cur)) {
-                    logger.debug("ISN'T VISITED ID: " + cur);
-                    logger.debug("REQUESTING FRIENDS");
-                    List<Person> friends = savePersonFriends(cur.toString());
-                    logger.debug("NUMBER OF FRIENDS " + friends.size());
+
+                    List<Person> friends = findAndSavePersonFriends(cur.toString());
                     visited.add(cur);
-                    logger.debug("CHECKING FRIENDS");
+
                     for (Person p : friends) {
                         if (!visited.contains(p.getVkId())) {
-                            logger.debug("ADDED TO VISITED " + p.getVkId());
                             nextLevel.add(p.getVkId());
                         }
                     }
                 }
             }
-            logger.debug("ADDED ALL INTO TO VISIT, SIZE " + nextLevel.size());
             toVisit.addAll(nextLevel);
             nextLevel.clear();
 
-            logger.debug("SEARCH FOR PATH");
+            notify("FINDING PATH");
             Iterable<Person> friends = personRepository.findPathByQuery(from, to);
             if (friends.iterator().hasNext()) {
-                logger.debug("SUCCESS");
+                notify("PATH IS FOUND");
                 return friends;
             } else {
-                logger.debug("FAILURE");
+                notify("THERE IS NO PATH YET");
             }
         }
-        logger.debug("CYCLE IS OVER");
         return personRepository.findPathByQuery(from, to);
     }
 
-    private List<Person> savePersonFriends(String id) {
-        UserXtrCounters userById = vkService.getUserById(id);
-        Person user = new Person(userById.getId(), userById.getFirstName(), userById.getLastName());
+    private List<Person> findAndSavePersonFriends(String id) {
+        Person user = vkService.getUserByStringId(id);
 
-        logger.debug("REQUESTING FRIENDS");
+        notify("REQUESTING FRIENDS OF " + user.getFirstName() + " " + user.getLastName());
+        List<Person> friends = vkService.findPersonFriends(user.getVkId());
+        notify("RESPONSE: " + friends.size() + " FRIENDS");
 
-        List<Person> friends = vkService.findPersonFriends(id);
-        logger.debug("REQUESTING IS OVER");
+        friends.forEach(user::friendOf);
 
-        if(friends != null){
-            friends.forEach(user::friendOf);
-            System.out.println(user.getVkId());
-            logger.debug("SAVING FRIENDS");
+        notify("SAVING FRIENDS TO NEO4J");
+        personRepository.save(user);
 
-            personRepository.save(user);
-            logger.debug("SAVING IS OVER");
+        return friends;
+    }
 
-            return friends;
-        } else {
-            return new ArrayList<>();
-        }
+    private void notify(String msg){
+        simpMessagingTemplate.convertAndSend("/topic/status", msg);
     }
 }
