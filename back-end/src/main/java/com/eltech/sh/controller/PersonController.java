@@ -1,6 +1,7 @@
 package com.eltech.sh.controller;
 
 import com.eltech.sh.model.Person;
+import com.eltech.sh.service.FixedHandshakeService;
 import com.eltech.sh.service.HandshakeService;
 import com.eltech.sh.service.VKService;
 import com.vk.api.sdk.objects.users.UserXtrCounters;
@@ -15,13 +16,15 @@ public class PersonController {
 
     private final VKService vkService;
     private final HandshakeService handshakeService;
+    private final FixedHandshakeService fixedHandshakeService;
  //   private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Autowired
-    public PersonController(VKService vkService, /*SimpMessagingTemplate simpMessagingTemplate,*/ HandshakeService handshakeService) {
+    public PersonController(VKService vkService, /*SimpMessagingTemplate simpMessagingTemplate,*/ HandshakeService handshakeService, FixedHandshakeService fixedHandshakeService) {
         this.vkService = vkService;
         this.handshakeService = handshakeService;
       //  this.simpMessagingTemplate = simpMessagingTemplate;
+        this.fixedHandshakeService = fixedHandshakeService;
     }
 
 
@@ -34,6 +37,6 @@ public class PersonController {
 
     @GetMapping("/find")
     Iterable<Person> checkSixHandshakes(@RequestParam("from") String fromId, @RequestParam("to") String toId) {
-        return handshakeService.checkSixHandshakes(fromId,toId);
+        return fixedHandshakeService.checkSixHandshakes(fromId,toId);
     }
 }

@@ -15,13 +15,13 @@
     "react-dom": "^15.6.1",
     "react-redux": "^5.0.6",
     "redux": "^3.7.2",
+    "redux-form": "^7.0.4",
     "redux-thunk": "^2.2.0",
     "sockjs-client": "^1.1.4",
     "stompjs": "^2.3.3",
     "style-loader": "^0.18.2",
     "webpack": "^3.6.0",
-    "webpack-dev-server": "^2.8.2",
-    "redux-form": "^7.0.4"
+    "webpack-dev-server": "^2.8.2"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
