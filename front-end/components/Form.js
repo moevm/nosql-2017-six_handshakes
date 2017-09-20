@@ -1,9 +1,10 @@
 import React from "react";
 import {reduxForm, Field} from 'redux-form';
-import {handleFormSubmit} from "../actions/index";
+import {handleFormSubmit} from "../actions/GraphActions";
 
 let Form = props => {
-    const { handleSubmit } = props;
+    const { handleSubmit, socket: {socketState, searchState} } = props;
+    const disabled = socketState !== 'CONNECTED' || searchState !== 'NONE';
     return (
         <form onSubmit={ handleSubmit }>
             <div>
@@ -12,7 +13,7 @@ let Form = props => {
             <div>
                 <Field name="to" component="input" type="text" placeholder="to"/>
             </div>
-            <button type="submit">Check!</button>
+            <button type="submit" disabled={disabled}>Check!</button>
         </form>
     )
 };

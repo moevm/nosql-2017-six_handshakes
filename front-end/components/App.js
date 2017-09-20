@@ -1,9 +1,10 @@
 import {UserInfo} from "./UserInfo";
 import React from "react";
-import {fetchUser} from "../actions/index";
+import {fetchUser} from "../actions/UserActions";
 import {connect} from 'react-redux';
 import {StatusBar} from "./StatusBar";
 import Form from "./Form";
+import {Result} from "./Result";
 
 class App extends React.Component {
     componentDidMount() {
@@ -11,10 +12,14 @@ class App extends React.Component {
     }
 
     render() {
+
+        const {user, graph, socket} = this.props;
+
         return (<div>
-            <UserInfo user = {this.props.user}/>
-            <Form/>
-            <StatusBar/>
+            <UserInfo user = {user}/>
+            <Form socket={socket}/>
+            <StatusBar socket={socket}/>
+            <Result result = {graph}/>
         </div>)
     }
 }
@@ -22,7 +27,9 @@ class App extends React.Component {
 export default connect(
     state => {
         return {
-            user: state.user
+            user: state.user,
+            graph: state.graph,
+            socket: state.socket
         }
     },
     dispatch => {
