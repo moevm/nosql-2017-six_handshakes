@@ -4,9 +4,9 @@ import {handleFormSubmit} from "../actions/GraphActions";
 
 let Form = props => {
     const { handleSubmit, socket: {socketState, searchState} } = props;
-    const disabled = socketState !== 'CONNECTED' || searchState !== 'NONE';
+    const disabled = socketState !== 'CONNECTED' || searchState.length !== 0;
     return (
-        <form onSubmit={ handleSubmit }>
+        <form className="sh-form" onSubmit={ handleSubmit }>
             <div>
                 <Field name="from" component="input" type="text" placeholder="from"/>
             </div>

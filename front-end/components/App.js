@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 import {StatusBar} from "./StatusBar";
 import Form from "./Form";
 import {Result} from "./Result";
+import "./style.css"
 
 class App extends React.Component {
     componentDidMount() {
