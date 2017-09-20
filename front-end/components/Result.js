@@ -7,7 +7,7 @@ export const Result = ({result}) => {
 
     return (
         <div>
-            {result}
+            {list}
         </div>
     )
 

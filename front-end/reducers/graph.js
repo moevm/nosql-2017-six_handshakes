@@ -5,6 +5,6 @@ const graph = (state = [], action) => {
         default:
             return state;
     }
-}
+};
 
 export default graph;

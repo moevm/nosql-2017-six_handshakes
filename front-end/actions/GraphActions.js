@@ -1,7 +1,9 @@
 import {fetchGet} from "../utils/fetchUtils";
 import {SERVER_URL} from "./index";
+import {clearSearchState} from "./SocketActions";
 
 export function handleFormSubmit(values, dispatch, props) {
+    dispatch(clearSearchState());
     fetchGet(
         `${SERVER_URL}/find?from=${values.from}&to=${values.to}`,
         dispatch,

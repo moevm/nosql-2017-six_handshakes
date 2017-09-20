@@ -1,6 +1,6 @@
 const initialState ={
     socketState: 'DISCONNECTED',
-    searchState: 'NONE'
+    searchState: []
 };
 
 const socket = (state = initialState, action) => {
@@ -8,7 +8,9 @@ const socket = (state = initialState, action) => {
         case 'SET_SOCKET_STATE':
             return Object.assign({}, state, {socketState: action.payload});
         case 'SET_SEARCH_STATE':
-            return Object.assign({}, state, {searchState: action.payload});
+            return Object.assign({}, state, {searchState: [...state.searchState, action.payload]});
+        case 'CLEAR_SEARCH_STATE':
+            return Object.assign({}, state, {searchState: []});
         default:
             return state;
     }

@@ -11,3 +11,9 @@ export const setSearchState = payload => {
         payload
     }
 };
+
+export const clearSearchState = () => {
+    return {
+        type: 'CLEAR_SEARCH_STATE',
+    }
+};

@@ -15,8 +15,9 @@ let store = createStore(
 );
 
 let stompClient = Stomp.over(new SockJS("/six-handshakes-websocket"));
+store.dispatch(setSocketState('CONNECTING...'));
 stompClient.connect({}, frame => {
-    stompClient.subscribe('/topic/status', json => store.dispatch(setSearchState(JSON.parse(json.body))));
+    stompClient.subscribe('/topic/status', json => store.dispatch(setSearchState(json.body)));
     store.dispatch(setSocketState('CONNECTED'));
 });
 
