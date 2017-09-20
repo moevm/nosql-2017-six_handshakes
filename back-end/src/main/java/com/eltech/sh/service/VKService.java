@@ -55,8 +55,13 @@ public class VKService {
     }
 
     public String getUserImgUrl(Integer userId) {
-        List<UserXtrCounters> list = vkApiClient.users().get(getUserActor()).unsafeParam("user_id", list_acc.get(0).getId()).unsafeParam("fields", "photo_400_orig").execute();
-        return list.get(0).getPhoto400Orig();
+        try {
+            List<UserXtrCounters> list = vkApiClient.users().get(getUserActor()).unsafeParam("user_id", list_acc.get(0).getId()).unsafeParam("fields", "photo_400_orig").execute();
+            return list.get(0).getPhoto400Orig();
+        } catch (ApiException | ClientException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 
