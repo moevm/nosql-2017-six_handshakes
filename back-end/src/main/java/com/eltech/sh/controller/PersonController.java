@@ -2,7 +2,6 @@ package com.eltech.sh.controller;
 
 import com.eltech.sh.model.Person;
 import com.eltech.sh.service.FixedHandshakeService;
-import com.eltech.sh.service.HandshakeService;
 import com.eltech.sh.service.VKService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,15 +15,15 @@ import javax.servlet.http.HttpServletRequest;
 public class PersonController {
 
     private final VKService vkService;
-    private final HandshakeService handshakeService;
+//    private final HandshakeService handshakeService;
     private final FixedHandshakeService fixedHandshakeService;
 
     @Autowired
     public PersonController(VKService vkService,
-                            HandshakeService handshakeService,
+//                            HandshakeService handshakeService,
                             FixedHandshakeService fixedHandshakeService) {
         this.vkService = vkService;
-        this.handshakeService = handshakeService;
+//        this.handshakeService = handshakeService;
         this.fixedHandshakeService = fixedHandshakeService;
     }
 

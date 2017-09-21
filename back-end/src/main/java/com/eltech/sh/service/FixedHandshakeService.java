@@ -76,17 +76,23 @@ public class FixedHandshakeService {
 
         notify("REQUESTING FRIENDS OF " + user.getFirstName() + " " + user.getLastName());
         List<Person> friends = vkService.findPersonFriends(user.getVkId());
-        notify("RESPONSE: " + friends.size() + " FRIENDS");
 
-        friends.forEach(user::friendOf);
+        if (friends != null){
+            notify("RESPONSE: " + friends.size() + " FRIENDS");
+            friends.forEach(user::friendOf);
 
-        notify("SAVING FRIENDS TO NEO4J");
-        personRepository.save(user);
+            notify("SAVING FRIENDS TO NEO4J");
+            personRepository.save(user);
 
-        return friends;
+            return friends;
+        } else {
+            notify("RESPONSE: " + 0 + " FRIENDS (USER IS BANNED OR SMTH ELSE");
+            return new ArrayList<>();
+        }
+
     }
 
-    private void notify(String msg){
+    private void notify(String msg) {
         simpMessagingTemplate.convertAndSend("/topic/status", msg);
     }
 }
