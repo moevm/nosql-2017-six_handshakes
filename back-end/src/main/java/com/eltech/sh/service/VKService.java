@@ -19,7 +19,6 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
-
 @Service
 public class VKService {
 
@@ -30,7 +29,11 @@ public class VKService {
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public VKService(VkCredentialsConfiguration configuration, VkApiClient vkApiClient, Friends friends, ObjectMapper objectMapper, HttpSession session) {
+    public VKService(VkCredentialsConfiguration configuration,
+                     VkApiClient vkApiClient,
+                     Friends friends,
+                     ObjectMapper objectMapper,
+                     HttpSession session) {
         this.configuration = configuration;
         this.vkApiClient = vkApiClient;
         this.friends = friends;
@@ -42,13 +45,26 @@ public class VKService {
         return new UserActor(configuration.getAppId(), (String) session.getAttribute("access_token"));
     }
 
-
-
-    public UserXtrCounters getUserById(String userId) {
+    public Person getUserByStringId(String id) {
         try {
-            List<UserXtrCounters> list = vkApiClient.users().get(getUserActor()).userIds(userId).execute();
-            return list.get(0);
-        } catch (ApiException | ClientException e) {
+            Thread.sleep(400);
+            UserXtrCounters user = vkApiClient.users().get(getUserActor()).userIds(id).execute().get(0);
+            return new Person(user.getId(), user.getFirstName(), user.getLastName());
+        } catch (ApiException | ClientException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public List<Person> findPersonFriends(Integer id) {
+        try {
+            String response = friends.get(getUserActor()).listId(id)
+                    .unsafeParam("fields", "city,domain")
+                    .unsafeParam("user_id", id)
+                    .executeAsRaw().getContent();
+            JsonNode jsonNode = objectMapper.readTree(response).path("response").path("items");
+            return objectMapper.convertValue(jsonNode, new TypeReference<List<Person>>() {});
+        } catch (ClientException | IOException e) {
             e.printStackTrace();
         }
         return null;
@@ -63,30 +79,6 @@ public class VKService {
         }
         return null;
     }
-
-
-    public List<Person> findPersonFriends(String userStringId) {
-        Integer userId = getUserById(userStringId).getId();
-        String response = null;
-        try {
-            response = friends.get(getUserActor()).listId(userId).unsafeParam("fields", "city,domain").unsafeParam("user_id", userId).executeAsRaw().getContent();
-        } catch (ClientException e) {
-            e.printStackTrace();
-        }
-
-        List<Person> convertedFriends = null;
-
-        try {
-            JsonNode jsonNode = objectMapper.readTree(response).path("response").path("items");
-            convertedFriends = objectMapper.convertValue(jsonNode, new TypeReference<List<Person>>() {
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return convertedFriends;
-    }
-
 
     public UserAuthResponse getAuthInfo(String code) {
         UserAuthResponse authResponse = null;
@@ -104,7 +96,5 @@ public class VKService {
         return authResponse;
     }
 
-    public Integer getOriginalId(String id){
-      return getUserById(id).getId();
-    }
+
 }

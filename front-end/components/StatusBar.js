@@ -1,34 +1,14 @@
 import React from "react";
-import {socketConnect, socketDisconnect} from "../socketClient";
-export class StatusBar extends React.Component{
-
-    constructor (){
-        super();
-        this.state = {status: 'NONE'};
-        this.handleStatusChange = this.handleStatusChange.bind(this);
-    }
-
-    handleStatusChange(value){
-        this.setState({status: value});
-    }
-
-    //TODO refactor: move socket logic in reducer ?
-    //TODO add loading while there is no connect
-    //TODO add STATUS reset after receiving response
-    componentDidMount(){
-        socketConnect('/topic/status', json => {
-            this.handleStatusChange(JSON.parse(json.body));
-        });
-    }
-
-    componentWillUnmount(){
-        socketDisconnect();
-    }
-
-    render(){
+export class StatusBar extends React.Component {
+    render() {
+        const {socketState, searchState} = this.props.socket;
+        console.log(searchState);
+        const list = searchState.map((item, index) => <li key={index}>{item}</li>);
         return (
             <div>
-                <p>STATUS: {this.state.status}</p>
+                <p>SOCKET STATE: {socketState}</p>
+                <p>SEARCH STATE:</p>
+                <ul>{list}</ul>
             </div>
         )
     }

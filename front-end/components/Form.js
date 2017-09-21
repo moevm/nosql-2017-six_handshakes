@@ -1,18 +1,19 @@
 import React from "react";
 import {reduxForm, Field} from 'redux-form';
-import {handleFormSubmit} from "../actions/index";
+import {handleFormSubmit} from "../actions/GraphActions";
 
 let Form = props => {
-    const { handleSubmit } = props;
+    const { handleSubmit, socket: {socketState, searchState} } = props;
+    const disabled = socketState !== 'CONNECTED' || searchState.length !== 0;
     return (
-        <form onSubmit={ handleSubmit }>
+        <form className="sh-form" onSubmit={ handleSubmit }>
             <div>
                 <Field name="from" component="input" type="text" placeholder="from"/>
             </div>
             <div>
                 <Field name="to" component="input" type="text" placeholder="to"/>
             </div>
-            <button type="submit">Check!</button>
+            <button type="submit" disabled={disabled}>Check!</button>
         </form>
     )
 };
