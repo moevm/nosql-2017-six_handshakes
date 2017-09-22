@@ -5,9 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Person {
 
@@ -20,9 +17,6 @@ public class Person {
     private String firstName;
     private String lastName;
     private String photoUrl;
-
-    @JsonIgnore
-    private Set<Person> friends;
 
     public Person() {
     }
@@ -61,22 +55,13 @@ public class Person {
         this.lastName = lastName;
     }
 
+    @JsonProperty("photoUrl")
     public String getPhotoUrl() {
         return photoUrl;
     }
 
+    @JsonProperty("photo_400_orig")
     public void setPhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
-    }
-
-    public void friendOf(Person person) {
-        if (friends == null) {
-            friends = new HashSet<>();
-        }
-        friends.add(person);
-    }
-
-    public Set<Person> getFriends() {
-        return friends;
     }
 }
