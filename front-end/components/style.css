@@ -6,3 +6,10 @@
     font-size: 16px;
     margin: 5px;
 }
+
+.image-round {
+    width: 150px;
+    height: 150px;
+    background-position: center;
+    background-size: cover;
+}
