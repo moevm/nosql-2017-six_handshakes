@@ -2,6 +2,7 @@ package com.eltech.sh.service;
 
 import com.eltech.sh.configuration.VkCredentialsConfiguration;
 import com.eltech.sh.model.Person;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class VKService {
@@ -45,7 +47,7 @@ public class VKService {
         return new UserActor(configuration.getAppId(), (String) session.getAttribute("access_token"));
     }
 
-    public Person getUserByStringId(String id) {
+    public Person getPersonByStringId(String id) {
         try {
             Thread.sleep(400);
             UserXtrCounters user = vkApiClient.users().get(getUserActor()).userIds(id).execute().get(0);
@@ -56,14 +58,14 @@ public class VKService {
         return null;
     }
 
-    public List<Person> findPersonFriends(Integer id) {
+    public List<Integer> findIdsOfPersonFriends(Integer id) {
         try {
             String response = friends.get(getUserActor()).listId(id)
-                    .unsafeParam("fields", "city,domain")
                     .unsafeParam("user_id", id)
                     .executeAsRaw().getContent();
             JsonNode jsonNode = objectMapper.readTree(response).path("response").path("items");
-            return objectMapper.convertValue(jsonNode, new TypeReference<List<Person>>() {});
+            System.out.println(response);
+            return objectMapper.convertValue(jsonNode, new TypeReference<List<Integer>>() {});
         } catch (ClientException | IOException e) {
             e.printStackTrace();
         }
@@ -75,6 +77,19 @@ public class VKService {
             List<UserXtrCounters> list = vkApiClient.users().get(getUserActor()).unsafeParam("user_id", userId).unsafeParam("fields", "photo_400_orig").execute();
             return list.get(0).getPhoto400Orig();
         } catch (ApiException | ClientException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public List<Person> getPersonsByIds(List<Integer> ids){
+        List<String> formattedIds = ids.stream().map(Object::toString).collect(Collectors.toList());
+        try {
+            String response = vkApiClient.users().get(getUserActor()).userIds(formattedIds).unsafeParam("fields", "photo_400_orig").executeAsRaw().getContent();
+
+            JsonNode jsonNode = objectMapper.readTree(response).path("response").path("items");
+            return objectMapper.convertValue(jsonNode, new TypeReference<List<Person>>() {});
+        } catch (ClientException | IOException e) {
             e.printStackTrace();
         }
         return null;
@@ -97,4 +112,7 @@ public class VKService {
     }
 
 
+    public Integer getPersonIntegerIdByStringId(String userId) {
+        return getPersonByStringId(userId).getVkId();
+    }
 }

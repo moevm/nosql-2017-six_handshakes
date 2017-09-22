@@ -8,47 +8,40 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class FixedHandshakeService {
+public class HandshakeService {
 
     private final VKService vkService;
     private Set<Integer> visited;
     private Queue<Integer> toVisit;
-    private List<Person> data;
+    private Map<Integer,List<Integer>> data;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final CSVService csvService;
     private final DBService dbService;
 
     @Autowired
-    public FixedHandshakeService(VKService vkService, SimpMessagingTemplate simpMessagingTemplate, CSVService csvService, DBService dbService) {
+    public HandshakeService(VKService vkService, SimpMessagingTemplate simpMessagingTemplate, CSVService csvService, DBService dbService) {
         this.vkService = vkService;
         this.simpMessagingTemplate = simpMessagingTemplate;
         this.csvService = csvService;
         this.dbService = dbService;
     }
 
-    public Iterable<Person> checkSixHandshakes(String from, String to) {
+    public List<Person> checkSixHandshakes(String from, String to) {
         toVisit = new LinkedList<>();
         visited = new HashSet<>(10000);
-        data = new ArrayList<>();
+        data = new HashMap<>();
 
-        Integer origIdFrom = vkService.getUserByStringId(from).getVkId();
-        Integer origIdTo = vkService.getUserByStringId(to).getVkId();
+        Integer origIdFrom = vkService.getPersonIntegerIdByStringId(from);
+        Integer origIdTo = vkService.getPersonIntegerIdByStringId(to);
 
         toVisit.add(origIdFrom);
         toVisit.add(origIdTo);
 
-        List<Person> path = createGraph(origIdFrom, origIdTo);
-        List<Person> result = new ArrayList<>();
-
-        path.forEach(p -> {
-            p.setPhotoUrl(vkService.getUserImgUrl(p.getVkId()));
-            result.add(p);
-        });
-
-        return result;
+        List<Integer> nodeIds = findPath(origIdFrom, origIdTo);
+        return vkService.getPersonsByIds(nodeIds);
     }
 
-    private List<Person> createGraph(int from, int to) {
+    private List<Integer> findPath(int from, int to) {
         Queue<Integer> nextLevel = new LinkedList<>();
         Date startTime = new Date();
 
@@ -59,12 +52,12 @@ public class FixedHandshakeService {
                 Integer cur = toVisit.poll();
                 if (!visited.contains(cur)) {
 
-                    List<Person> friends = findAndSavePersonFriends(cur.toString());
+                    List<Integer> friendIds = findAndSavePersonFriends(cur.toString());
                     visited.add(cur);
 
-                    for (Person p : friends) {
-                        if (!visited.contains(p.getVkId())) {
-                            nextLevel.add(p.getVkId());
+                    for (Integer id : friendIds) {
+                        if (!visited.contains(id)) {
+                            nextLevel.add(id);
                         }
                     }
                 }
@@ -79,11 +72,11 @@ public class FixedHandshakeService {
             data.clear();
 
             notify("FINDING PATH");
-            List<Person> friends = dbService.findPathByQuery(from, to);
-            if (friends.iterator().hasNext()) {
+            List<Integer> nodeIds = dbService.findPathByQuery(from, to);
+            if(!nodeIds.isEmpty()){
                 notify("PATH IS FOUND: " + new Date(new Date().getTime() - startTime.getTime()));
                 csvService.deleteCSV();
-                return friends;
+                return nodeIds;
             } else {
                 notify("THERE IS NO PATH YET");
                 csvService.deleteCSV();
@@ -92,17 +85,16 @@ public class FixedHandshakeService {
         return dbService.findPathByQuery(from, to);
     }
 
-    private List<Person> findAndSavePersonFriends(String id) {
-        Person user = vkService.getUserByStringId(id);
+    private List<Integer> findAndSavePersonFriends(String userId) {
+        Integer id = vkService.getPersonIntegerIdByStringId(userId);
 
-        notify("REQUESTING FRIENDS OF " + user.getFirstName() + " " + user.getLastName());
-        List<Person> friends = vkService.findPersonFriends(user.getVkId());
+        notify("REQUESTING FRIENDS OF USER #" + id);
+        List<Integer> friendIds = vkService.findIdsOfPersonFriends(id);
 
-        if (friends != null) {
-            friends.forEach(user::friendOf);
-            data.add(user);
-            notify("RESPONSE: " + friends.size() + " FRIENDS");
-            return friends;
+        if (friendIds != null) {
+            data.put(id, friendIds);
+            notify("RESPONSE: " + friendIds.size() + " FRIENDS");
+            return friendIds;
         } else {
             notify("RESPONSE: " + 0 + " FRIENDS (USER IS BANNED OR SMTH ELSE)");
             return new ArrayList<>();
