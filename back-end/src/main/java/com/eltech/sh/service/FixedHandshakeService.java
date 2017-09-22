@@ -1,7 +1,6 @@
 package com.eltech.sh.service;
 
 import com.eltech.sh.model.Person;
-import com.eltech.sh.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -12,21 +11,25 @@ import java.util.*;
 public class FixedHandshakeService {
 
     private final VKService vkService;
-    private final PersonRepository personRepository;
     private Set<Integer> visited;
     private Queue<Integer> toVisit;
+    private List<Person> data;
     private final SimpMessagingTemplate simpMessagingTemplate;
+    private final CSVService csvService;
+    private final DBService dbService;
 
     @Autowired
-    public FixedHandshakeService(VKService vkService, PersonRepository personRepository, SimpMessagingTemplate simpMessagingTemplate) {
+    public FixedHandshakeService(VKService vkService, SimpMessagingTemplate simpMessagingTemplate, CSVService csvService, DBService dbService) {
         this.vkService = vkService;
-        this.personRepository = personRepository;
         this.simpMessagingTemplate = simpMessagingTemplate;
+        this.csvService = csvService;
+        this.dbService = dbService;
     }
 
     public Iterable<Person> checkSixHandshakes(String from, String to) {
         toVisit = new LinkedList<>();
         visited = new HashSet<>(10000);
+        data = new ArrayList<>();
 
         Integer origIdFrom = vkService.getUserByStringId(from).getVkId();
         Integer origIdTo = vkService.getUserByStringId(to).getVkId();
@@ -34,15 +37,25 @@ public class FixedHandshakeService {
         toVisit.add(origIdFrom);
         toVisit.add(origIdTo);
 
-        return createGraph(origIdFrom, origIdTo);
+        List<Person> path = createGraph(origIdFrom, origIdTo);
+        List<Person> result = new ArrayList<>();
+
+        path.forEach(p -> {
+            p.setPhotoUrl(vkService.getUserImgUrl(p.getVkId()));
+            result.add(p);
+        });
+
+        return result;
     }
 
-    private Iterable<Person> createGraph(int from, int to) {
+    private List<Person> createGraph(int from, int to) {
         Queue<Integer> nextLevel = new LinkedList<>();
+        Date startTime = new Date();
 
         for (int i = 0; i < 3; i++) {
             notify("STARTED ITERATION# " + i);
             while (!toVisit.isEmpty()) {
+                notify("PEOPLE TO CHECK " + toVisit.size());
                 Integer cur = toVisit.poll();
                 if (!visited.contains(cur)) {
 
@@ -58,17 +71,25 @@ public class FixedHandshakeService {
             }
             toVisit.addAll(nextLevel);
             nextLevel.clear();
+            notify("SAVING FRIENDS TO NEO4J");
+            csvService.save(data);
+            notify("MIGRATION TO DB");
+            dbService.migrateToDB();
+            notify("MIGRATION TO DB IS OVER");
+            data.clear();
 
             notify("FINDING PATH");
-            Iterable<Person> friends = personRepository.findPathByQuery(from, to);
+            List<Person> friends = dbService.findPathByQuery(from, to);
             if (friends.iterator().hasNext()) {
-                notify("PATH IS FOUND");
+                notify("PATH IS FOUND: " + new Date(new Date().getTime() - startTime.getTime()));
+                csvService.deleteCSV();
                 return friends;
             } else {
                 notify("THERE IS NO PATH YET");
+                csvService.deleteCSV();
             }
         }
-        return personRepository.findPathByQuery(from, to);
+        return dbService.findPathByQuery(from, to);
     }
 
     private List<Person> findAndSavePersonFriends(String id) {
@@ -77,16 +98,13 @@ public class FixedHandshakeService {
         notify("REQUESTING FRIENDS OF " + user.getFirstName() + " " + user.getLastName());
         List<Person> friends = vkService.findPersonFriends(user.getVkId());
 
-        if (friends != null){
-            notify("RESPONSE: " + friends.size() + " FRIENDS");
+        if (friends != null) {
             friends.forEach(user::friendOf);
-
-            notify("SAVING FRIENDS TO NEO4J");
-            personRepository.save(user);
-
+            data.add(user);
+            notify("RESPONSE: " + friends.size() + " FRIENDS");
             return friends;
         } else {
-            notify("RESPONSE: " + 0 + " FRIENDS (USER IS BANNED OR SMTH ELSE");
+            notify("RESPONSE: " + 0 + " FRIENDS (USER IS BANNED OR SMTH ELSE)");
             return new ArrayList<>();
         }
 

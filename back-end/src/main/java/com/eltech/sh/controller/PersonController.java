@@ -15,15 +15,12 @@ import javax.servlet.http.HttpServletRequest;
 public class PersonController {
 
     private final VKService vkService;
-//    private final HandshakeService handshakeService;
     private final FixedHandshakeService fixedHandshakeService;
 
     @Autowired
     public PersonController(VKService vkService,
-//                            HandshakeService handshakeService,
                             FixedHandshakeService fixedHandshakeService) {
         this.vkService = vkService;
-//        this.handshakeService = handshakeService;
         this.fixedHandshakeService = fixedHandshakeService;
     }
 
