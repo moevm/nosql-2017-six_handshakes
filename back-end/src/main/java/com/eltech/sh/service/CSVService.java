@@ -15,9 +15,13 @@ import java.util.Map;
 @Service
 public class CSVService {
     private static final String NEW_LINE_SEPARATOR = "\n";
-    private static final String FILE_NAME = "C:/Users/pc-home/Documents/Neo4j/default.graphdb/import/data.csv";
+    //private static final String FILE_NAME = "D:/DataBaseNeo4j/import/data.csv";
+    private static String FILE_NAME = "";
 
     public void save(Map<Integer, List<Integer>> map) {
+
+       // String current_path =System.getProperty("user.dir");
+        createFile();
         FileWriter fileWriter = null;
         CSVPrinter csvFilePrinter = null;
         CSVFormat csvFileFormat = CSVFormat.DEFAULT.withRecordSeparator(NEW_LINE_SEPARATOR);
@@ -55,5 +59,13 @@ public class CSVService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    public void createFile() {
+        File folder = new File(System.getProperty("user.dir") +
+                File.separator + "import");
+        if (!folder.exists()) {
+            folder.mkdir();
+        }
+        FILE_NAME = System.getProperty("user.dir") +File.separator + "import" + File.separator +  "data.csv";
     }
 }
