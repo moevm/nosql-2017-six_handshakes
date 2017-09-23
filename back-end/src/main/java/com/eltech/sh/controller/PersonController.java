@@ -33,6 +33,10 @@ public class PersonController {
 
     @GetMapping("/find")
     List<Person> checkSixHandshakes(@RequestParam("from") String fromId, @RequestParam("to") String toId) {
-        return handshakeService.checkSixHandshakes(fromId,toId);
+        List<Person> list = handshakeService.checkSixHandshakes(fromId, toId);
+//        for (Person p : list) {
+//            System.out.println(p.getVkId() +": " + p.getFirstName() + " " + p.getLastName());
+//        }
+        return list;
     }
 }

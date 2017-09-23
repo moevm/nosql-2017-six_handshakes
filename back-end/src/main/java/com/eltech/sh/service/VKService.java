@@ -10,6 +10,7 @@ import com.vk.api.sdk.actions.Friends;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.UserActor;
 import com.vk.api.sdk.exceptions.ApiException;
+import com.vk.api.sdk.exceptions.ApiTooManyException;
 import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.objects.UserAuthResponse;
 import com.vk.api.sdk.objects.users.UserXtrCounters;
@@ -48,14 +49,23 @@ public class VKService {
     }
 
     public Person getPersonByStringId(String id) {
-        try {
-            Thread.sleep(400);
-            UserXtrCounters user = vkApiClient.users().get(getUserActor()).userIds(id).execute().get(0);
-            return new Person(user.getId(), user.getFirstName(), user.getLastName());
-        } catch (ApiException | ClientException | InterruptedException e) {
-            e.printStackTrace();
+       // Boolean done = false;
+        while (true) {
+            try {
+                UserXtrCounters user = vkApiClient.users().get(getUserActor()).userIds(id).execute().get(0);
+              //  done = true;
+                return new Person(user.getId(), user.getFirstName(), user.getLastName());
+            } catch (ApiTooManyException e) {
+                try {
+                    Thread.sleep(400);
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            } catch (ApiException | ClientException e/*| InterruptedException e */) {
+                e.printStackTrace();
+            }
         }
-        return null;
+       // return null;
     }
 
     public List<Integer> findIdsOfPersonFriends(Integer id) {
@@ -65,7 +75,8 @@ public class VKService {
                     .executeAsRaw().getContent();
             JsonNode jsonNode = objectMapper.readTree(response).path("response").path("items");
             System.out.println(response);
-            return objectMapper.convertValue(jsonNode, new TypeReference<List<Integer>>() {});
+            return objectMapper.convertValue(jsonNode, new TypeReference<List<Integer>>() {
+            });
         } catch (ClientException | IOException e) {
             e.printStackTrace();
         }
@@ -73,22 +84,33 @@ public class VKService {
     }
 
     public String getUserImgUrl(Integer userId) {
-        try {
-            List<UserXtrCounters> list = vkApiClient.users().get(getUserActor()).unsafeParam("user_id", userId).unsafeParam("fields", "photo_400_orig").execute();
-            return list.get(0).getPhoto400Orig();
-        } catch (ApiException | ClientException e) {
-            e.printStackTrace();
+        Boolean done = false;
+        while (!done) {
+            try {
+                List<UserXtrCounters> list = vkApiClient.users().get(getUserActor()).unsafeParam("user_id", userId).unsafeParam("fields", "photo_400_orig").execute();
+                done = true;
+                return list.get(0).getPhoto400Orig();
+            } catch (ApiTooManyException e) {
+                try {
+                    Thread.sleep(400);
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            } catch (ApiException | ClientException e) {
+                e.printStackTrace();
+            }
         }
         return null;
     }
 
-    public List<Person> getPersonsByIds(List<Integer> ids){
+    public List<Person> getPersonsByIds(List<Integer> ids) {
         List<String> formattedIds = ids.stream().map(Object::toString).collect(Collectors.toList());
         try {
             String response = vkApiClient.users().get(getUserActor()).userIds(formattedIds).unsafeParam("fields", "photo_400_orig").executeAsRaw().getContent();
 
             JsonNode jsonNode = objectMapper.readTree(response).path("response").path("items");
-            return objectMapper.convertValue(jsonNode, new TypeReference<List<Person>>() {});
+            return objectMapper.convertValue(jsonNode, new TypeReference<List<Person>>() {
+            });
         } catch (ClientException | IOException e) {
             e.printStackTrace();
         }
@@ -96,17 +118,28 @@ public class VKService {
     }
 
     public UserAuthResponse getAuthInfo(String code) {
+        Boolean done = false;
+
         UserAuthResponse authResponse = null;
-        try {
-            authResponse = vkApiClient.oauth()
-                    .userAuthorizationCodeFlow(
-                            configuration.getAppId(),
-                            configuration.getClientSecret(),
-                            configuration.getRedirectUri(),
-                            code)
-                    .execute();
-        } catch (ApiException | ClientException e) {
-            e.printStackTrace();
+        while (!done) {
+            try {
+                authResponse = vkApiClient.oauth()
+                        .userAuthorizationCodeFlow(
+                                configuration.getAppId(),
+                                configuration.getClientSecret(),
+                                configuration.getRedirectUri(),
+                                code)
+                        .execute();
+                done = true;
+            } catch (ApiTooManyException e) {
+                try {
+                    Thread.sleep(400);
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            } catch (ApiException | ClientException e) {
+                e.printStackTrace();
+            }
         }
         return authResponse;
     }
