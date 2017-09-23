@@ -12,8 +12,8 @@ public class HandshakeService {
     private final VKService vkService;
     private Set<Integer> visited;
     private Queue<Integer> toVisit;
-    private Map<Integer,List<Integer>> data;
-//    private final SimpMessagingTemplate simpMessagingTemplate;
+    private Map<Integer, List<Integer>> data;
+    //    private final SimpMessagingTemplate simpMessagingTemplate;
     private final CSVService csvService;
     private final DBService dbService;
 
@@ -72,7 +72,7 @@ public class HandshakeService {
 
             notify("FINDING PATH");
             List<Integer> nodeIds = dbService.findPathByQuery(from, to);
-            if(!nodeIds.isEmpty()){
+            if (!nodeIds.isEmpty()) {
                 notify("PATH IS FOUND: " + new Date(new Date().getTime() - startTime.getTime()));
                 //FIXME we need to clear file after each iteration but there is an exception when we do it
 //                csvService.deleteCSV();

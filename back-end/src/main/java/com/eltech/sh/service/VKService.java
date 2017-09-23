@@ -49,11 +49,10 @@ public class VKService {
     }
 
     public Person getPersonByStringId(String id) {
-       // Boolean done = false;
+
         while (true) {
             try {
                 UserXtrCounters user = vkApiClient.users().get(getUserActor()).userIds(id).execute().get(0);
-              //  done = true;
                 return new Person(user.getId(), user.getFirstName(), user.getLastName());
             } catch (ApiTooManyException e) {
                 try {
@@ -65,7 +64,6 @@ public class VKService {
                 e.printStackTrace();
             }
         }
-       // return null;
     }
 
     public List<Integer> findIdsOfPersonFriends(Integer id) {
