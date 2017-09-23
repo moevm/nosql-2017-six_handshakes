@@ -21,7 +21,7 @@ public class DBService {
 
     public void migrateToDB() {
         session.run("CREATE CONSTRAINT ON (person:Person) ASSERT person.vkId IS UNIQUE");
-        session.run("LOAD CSV FROM 'file:///opa.csv' AS line\n" +
+        session.run("LOAD CSV FROM 'file:///data.csv' AS line\n" +
                 "MERGE (from:Person { vkId: toInt(line[0])})\n" +
                 "MERGE (to:Person { vkId: toInt(line[1])})\n" +
                 "MERGE ((from)-[:FRIEND]-(to))");

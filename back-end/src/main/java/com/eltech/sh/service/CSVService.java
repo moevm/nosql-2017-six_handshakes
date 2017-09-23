@@ -15,7 +15,7 @@ import java.util.Map;
 @Service
 public class CSVService {
     private static final String NEW_LINE_SEPARATOR = "\n";
-    private static final String FILE_NAME = "C:/Users/Admin/Documents/Neo4j/default.graphdb/import/opa.csv";
+    private static final String FILE_NAME = "C:/Users/Admin/Documents/Neo4j/default.graphdb/import/data.csv";
 
     public void save(Map<Integer, List<Integer>> map) {
         FileWriter fileWriter = null;
