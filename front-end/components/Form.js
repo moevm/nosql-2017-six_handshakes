@@ -13,7 +13,7 @@ let Form = props => {
             <div>
                 <Field name="to" component="input" type="text" placeholder="to"/>
             </div>
-            <button type="submit" disabled={disabled}>Check!</button>
+            <button type="submit">Check!</button>
         </form>
     )
 };

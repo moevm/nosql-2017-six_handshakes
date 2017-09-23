@@ -14,12 +14,12 @@ let store = createStore(
     applyMiddleware(thunk)
 );
 
-let stompClient = Stomp.over(new SockJS("/six-handshakes-websocket"));
-store.dispatch(setSocketState('CONNECTING...'));
-stompClient.connect({}, frame => {
-    stompClient.subscribe('/topic/status', json => store.dispatch(setSearchState(json.body)));
-    store.dispatch(setSocketState('CONNECTED'));
-});
+// let stompClient = Stomp.over(new SockJS("/six-handshakes-websocket"));
+// store.dispatch(setSocketState('CONNECTING...'));
+// stompClient.connect({}, frame => {
+//     stompClient.subscribe('/topic/status', json => store.dispatch(setSearchState(json.body)));
+//     store.dispatch(setSocketState('CONNECTED'));
+// });
 
 render(
     <Provider store={store}>
