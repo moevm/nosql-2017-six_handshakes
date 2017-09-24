@@ -76,11 +76,11 @@ public class HandshakeService {
             if (!nodeIds.isEmpty()) {
                 notify("PATH IS FOUND: " + new Date(new Date().getTime() - startTime.getTime()));
                 //FIXME we need to clear file after each iteration but there is an exception when we do it
-//                csvService.deleteCSV();
+                csvService.deleteCSV();
                 return nodeIds;
             } else {
                 notify("THERE IS NO PATH YET");
-//                csvService.deleteCSV();
+                csvService.deleteCSV();
             }
         }
         return dbService.findPathByQuery(from, to);
