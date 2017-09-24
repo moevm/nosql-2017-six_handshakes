@@ -2,6 +2,7 @@ package com.eltech.sh.service;
 
 import com.eltech.sh.model.Person;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -13,14 +14,14 @@ public class HandshakeService {
     private Set<Integer> visited;
     private Queue<Integer> toVisit;
     private Map<Integer, List<Integer>> data;
-    //    private final SimpMessagingTemplate simpMessagingTemplate;
+    private final SimpMessagingTemplate simpMessagingTemplate;
     private final CSVService csvService;
     private final DBService dbService;
 
     @Autowired
-    public HandshakeService(VKService vkService, /*SimpMessagingTemplate simpMessagingTemplate,*/ CSVService csvService, DBService dbService) {
+    public HandshakeService(VKService vkService, SimpMessagingTemplate simpMessagingTemplate, CSVService csvService, DBService dbService) {
         this.vkService = vkService;
-//        this.simpMessagingTemplate = simpMessagingTemplate;
+        this.simpMessagingTemplate = simpMessagingTemplate;
         this.csvService = csvService;
         this.dbService = dbService;
     }
@@ -103,7 +104,7 @@ public class HandshakeService {
     }
 
     private void notify(String msg) {
-        System.out.println(msg);
-//        simpMessagingTemplate.convertAndSend("/topic/status", msg);
+//        System.out.println(msg);
+        simpMessagingTemplate.convertAndSend("/topic/status", msg);
     }
 }
