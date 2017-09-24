@@ -60,8 +60,8 @@ public class VKService {
                 } catch (InterruptedException e1) {
                     e1.printStackTrace();
                 }
-            } catch (ApiException | ClientException e/*| InterruptedException e */) {
-                e.printStackTrace();
+            } catch (ApiException | ClientException e) {
+                System.out.println("Reset request");
             }
         }
     }
@@ -82,23 +82,22 @@ public class VKService {
     }
 
     public String getUserImgUrl(Integer userId) {
-        Boolean done = false;
-        while (!done) {
+
+        while (true) {
             try {
                 List<UserXtrCounters> list = vkApiClient.users().get(getUserActor()).unsafeParam("user_id", userId).unsafeParam("fields", "photo_400_orig").execute();
-                done = true;
                 return list.get(0).getPhoto400Orig();
-            } catch (ApiTooManyException e) {
+        } catch (ApiTooManyException e) {
                 try {
                     Thread.sleep(400);
                 } catch (InterruptedException e1) {
                     e1.printStackTrace();
                 }
             } catch (ApiException | ClientException e) {
-                e.printStackTrace();
+                System.out.println("Reset request");
             }
         }
-        return null;
+
     }
 
     public List<Person> getPersonsByIds(List<Integer> ids) {
@@ -116,10 +115,9 @@ public class VKService {
     }
 
     public UserAuthResponse getAuthInfo(String code) {
-        Boolean done = false;
 
         UserAuthResponse authResponse = null;
-        while (!done) {
+        while (true) {
             try {
                 authResponse = vkApiClient.oauth()
                         .userAuthorizationCodeFlow(
@@ -128,7 +126,7 @@ public class VKService {
                                 configuration.getRedirectUri(),
                                 code)
                         .execute();
-                done = true;
+                return authResponse;
             } catch (ApiTooManyException e) {
                 try {
                     Thread.sleep(400);
@@ -136,10 +134,9 @@ public class VKService {
                     e1.printStackTrace();
                 }
             } catch (ApiException | ClientException e) {
-                e.printStackTrace();
+                System.out.println("Reset request");
             }
         }
-        return authResponse;
     }
 
 
