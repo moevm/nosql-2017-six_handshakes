@@ -7,6 +7,7 @@ import {Result} from "./Result";
 import "./style.css"
 import "../resources/css/imports.css"
 import {Header} from "./Header";
+import {ChartPanel} from "./ChartPanel";
 
 class App extends React.Component {
     componentDidMount() {
