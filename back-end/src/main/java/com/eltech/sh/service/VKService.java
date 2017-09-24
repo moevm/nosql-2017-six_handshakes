@@ -52,8 +52,9 @@ public class VKService {
 
         while (true) {
             try {
-                UserXtrCounters user = vkApiClient.users().get(getUserActor()).userIds(id).execute().get(0);
-                return new Person(user.getId(), user.getFirstName(), user.getLastName());
+                UserXtrCounters user = vkApiClient.users().get(getUserActor()).userIds(id).unsafeParam("fields", "photo_400_orig").execute().get(0);
+                System.out.println(user);
+                return new Person(user.getId(), user.getFirstName(), user.getLastName(), user.getPhoto400Orig());
             } catch (ApiTooManyException e) {
                 try {
                     Thread.sleep(400);
@@ -61,7 +62,7 @@ public class VKService {
                     e1.printStackTrace();
                 }
             } catch (ApiException | ClientException e) {
-                System.out.println("Reset request");
+                System.out.println("Reset request [getPersonByStringId]");
             }
         }
     }
@@ -72,7 +73,6 @@ public class VKService {
                     .unsafeParam("user_id", id)
                     .executeAsRaw().getContent();
             JsonNode jsonNode = objectMapper.readTree(response).path("response").path("items");
-            System.out.println(response);
             return objectMapper.convertValue(jsonNode, new TypeReference<List<Integer>>() {
             });
         } catch (ClientException | IOException e) {
@@ -94,7 +94,7 @@ public class VKService {
                     e1.printStackTrace();
                 }
             } catch (ApiException | ClientException e) {
-                System.out.println("Reset request");
+                System.out.println("Reset request [getUserImgUrl]");
             }
         }
 
@@ -134,7 +134,7 @@ public class VKService {
                     e1.printStackTrace();
                 }
             } catch (ApiException | ClientException e) {
-                System.out.println("Reset request");
+                System.out.println("Reset request [getAuthInfo]");
             }
         }
     }
