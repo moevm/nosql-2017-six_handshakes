@@ -17,8 +17,18 @@ module.exports = {
                 query: {
                     presets: ['es2015', 'react']
                 }
+            },
+            {
+                test: /\.(jpe?g|png|svg|gif|woff|woff2|eot|ttf)$/i,
+                loader: 'file-loader',
+                options: {
+                    name: '[name].[ext]',
+                    outputPath: 'fonts/'
+                }
             }
-        ]
+        ],
+
+
     },
     plugins: [
         new HtmlWebpackPlugin({

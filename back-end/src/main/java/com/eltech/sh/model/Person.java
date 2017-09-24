@@ -21,10 +21,11 @@ public class Person {
     public Person() {
     }
 
-    public Person(Integer vkId, String firstName, String lastName) {
+    public Person(Integer vkId, String firstName, String lastName, String photoUrl) {
         this.vkId = vkId;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.photoUrl = photoUrl;
     }
 
     public Integer getVkId() {
