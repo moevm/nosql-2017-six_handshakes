@@ -15,22 +15,18 @@ import java.util.Map;
 @Service
 public class CSVService {
     private static final String NEW_LINE_SEPARATOR = "\n";
-    //private static final String FILE_NAME = "D:/DataBaseNeo4j/import/data.csv";
-    private static String FILE_NAME = "";
 
     public void save(Map<Integer, List<Integer>> map) {
-
-       // String current_path =System.getProperty("user.dir");
         createFile();
         FileWriter fileWriter = null;
         CSVPrinter csvFilePrinter = null;
         CSVFormat csvFileFormat = CSVFormat.DEFAULT.withRecordSeparator(NEW_LINE_SEPARATOR);
 
         try {
-            fileWriter = new FileWriter(FILE_NAME, true);
+            fileWriter = new FileWriter(getFilePath(), true);
             csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat);
 
-            for(Map.Entry<Integer, List<Integer>> entry : map.entrySet()) {
+            for (Map.Entry<Integer, List<Integer>> entry : map.entrySet()) {
                 int userId = entry.getKey();
                 for (Integer friendId : entry.getValue()) {
                     List<String> record = Arrays.asList(
@@ -53,19 +49,23 @@ public class CSVService {
         }
     }
 
-    public void deleteCSV(){
+    public void deleteCSV() {
         try {
-            Files.deleteIfExists(new File(FILE_NAME).toPath());
+            Files.deleteIfExists(new File(getFilePath()).toPath());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
     public void createFile() {
         File folder = new File(System.getProperty("user.dir") +
                 File.separator + "import");
         if (!folder.exists()) {
             folder.mkdir();
         }
-        FILE_NAME = System.getProperty("user.dir") +File.separator + "import" + File.separator +  "data.csv";
+    }
+
+    public String getFilePath() {
+        return String.format("%s%2$simport%2$sdata.csv", System.getProperty("user.dir"), File.separator);
     }
 }
