@@ -20,7 +20,7 @@ public class AccessTokenFilterConfigurerAdapter extends WebMvcConfigurerAdapter 
     public FilterRegistrationBean accessTokenFilterRegistrationBean() {
         FilterRegistrationBean regBean = new FilterRegistrationBean();
         regBean.setFilter(filter);
-        regBean.addUrlPatterns("/*");
+        regBean.addUrlPatterns("/", "/me", "/find");
 
         return regBean;
     }
