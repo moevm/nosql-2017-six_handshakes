@@ -105,7 +105,7 @@ public class VKService {
         try {
             String response = vkApiClient.users().get(getUserActor()).userIds(formattedIds).unsafeParam("fields", "photo_400_orig").executeAsRaw().getContent();
 
-            JsonNode jsonNode = objectMapper.readTree(response).path("response").path("items");
+            JsonNode jsonNode = objectMapper.readTree(response).path("response");
             return objectMapper.convertValue(jsonNode, new TypeReference<List<Person>>() {
             });
         } catch (ClientException | IOException e) {
