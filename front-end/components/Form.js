@@ -8,7 +8,7 @@ let Form = props => {
     return (
         <form className="main-form" onSubmit={handleSubmit}>
             <div>
-                <h2>Choose data source</h2>
+                <h3>Choose data source</h3>
                 <div className="icon-button">
                     <i className="fa fa-vk "/>
                     vkontakte
@@ -18,11 +18,11 @@ let Form = props => {
                     your data
                 </div>
             </div>
-            <div>
+            <div className="arrow">
                 <i className="fa fa-long-arrow-right fa-2x"/>
             </div>
             <div>
-                <h2>Enter IDs</h2>
+                <h3>Enter IDs</h3>
                 <div>
                     <Field name="from" component="input" type="text" placeholder="from"/>
                 </div>
@@ -30,11 +30,11 @@ let Form = props => {
                     <Field name="to" component="input" type="text" placeholder="to"/>
                 </div>
             </div>
-            <div>
+            <div className="arrow">
                 <i className="fa fa-long-arrow-right fa-2x"/>
             </div>
             <div>
-                <button type="submit" disabled={disabled}>Check!</button>
+                <button className="submit-button" type="submit" disabled={disabled}>Check!</button>
             </div>
         </form>
     )
