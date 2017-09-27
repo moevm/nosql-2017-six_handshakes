@@ -6,19 +6,22 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonElement;
 import com.vk.api.sdk.actions.Friends;
+import com.vk.api.sdk.client.TransportClient;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.UserActor;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ApiTooManyException;
 import com.vk.api.sdk.exceptions.ClientException;
+import com.vk.api.sdk.httpclient.HttpTransportClient;
 import com.vk.api.sdk.objects.UserAuthResponse;
 import com.vk.api.sdk.objects.users.UserXtrCounters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -139,8 +142,51 @@ public class VKService {
         }
     }
 
-
     public Integer getPersonIntegerIdByStringId(String userId) {
         return getPersonByStringId(userId).getVkId();
+    }
+
+    public String readFileCode(String path)
+    {
+        StringBuilder code = new StringBuilder();
+        File file = new File(path);
+
+        try {
+            BufferedReader in = new BufferedReader(new FileReader( file.getAbsoluteFile()));
+            try {
+                String s;
+                while ((s = in.readLine()) != null) {
+                    code.append(s);
+                    code.append("\n");
+                }
+            } finally {
+                in.close();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        catch(IOException e) {
+            throw new RuntimeException(e);
+        }
+        return code.toString();
+    }
+
+    public JsonElement getFriends(String userIds)
+    {
+        JsonElement jsonOfFriends=null;
+        try {
+
+            String vkScriptCode = readFileCode("src\\main\\vkScript\\getFriedsCode");
+            jsonOfFriends = vkApiClient.execute().code(
+                    getUserActor(), "var listId = \"" + userIds + "\";"+ vkScriptCode
+            ).execute();
+
+        } catch (ApiException e) {
+            e.printStackTrace();
+        } catch (ClientException e) {
+            e.printStackTrace();
+        }
+        return jsonOfFriends;
+
     }
 }
