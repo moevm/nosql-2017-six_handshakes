@@ -24,8 +24,7 @@ export const setGraph = payload => {
 //TODO replace console log by some action
 function fetchSearchSuccess(json) {
     return dispatch => {
-        console.log('search finished');
-        console.log(json);
+        console.log('search finished', json);
         dispatch(setGraph(json));
     }
 }

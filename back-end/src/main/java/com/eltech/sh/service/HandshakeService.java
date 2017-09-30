@@ -1,80 +1,110 @@
-//package com.eltech.sh.service;
-//
-//import com.eltech.sh.model.Person;
-//import com.eltech.sh.repository.PersonRepository;
-//import com.vk.api.sdk.objects.users.UserXtrCounters;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Service;
-//
-//import java.util.*;
-//
-//@Service
-//public class HandshakeService {
-//
-//    private final VKService vkService;
-//    private final PersonRepository personRepository;
-//    private Set<Integer> visited;
-//    private Queue<Integer> toVisit;
-//
-//    @Autowired
-//    public HandshakeService(VKService vkService, PersonRepository personRepository) {
-//        this.vkService = vkService;
-//        this.personRepository = personRepository;
-//
-//    }
-//
-//    public Iterable<Person> checkSixHandshakes(String from, String to) {
-//        toVisit = new LinkedList<>();
-//        visited = new HashSet<>(10000);
-//
-//        Integer origIdFrom = vkService.getOriginalId(from),
-//                origIdTo = vkService.getOriginalId(to);
-//
-//        toVisit.add(origIdFrom);
-//        toVisit.add(origIdTo);
-//
-//        Iterable<Person> path = createGraph(origIdFrom, origIdTo);
-//        return path;
-//    }
-//
-//    protected Iterable<Person> createGraph(int from, int to) {
-//        Queue<Integer> nextLevel = new LinkedList<>();
-//
-//        for (int i = 0; i < 3; i++) {
-//            while (!toVisit.isEmpty()) {
-//                Integer cur = toVisit.poll();
-//                if (!visited.contains(cur)) {
-//                    List<Person> friends = savePersonFriends(cur.toString());
-//                    visited.add(cur);
-//                    for (Person p : friends) {
-//                        if (!visited.contains(p.getVkId())) {
-//                            nextLevel.add(p.getVkId());
-//                        }
-//                    }
-//                }
-//            }
-//
-//            toVisit.addAll(nextLevel);
-//            nextLevel.clear();
-//
-//            Iterable<Person> friends = personRepository.findPathByQuery(from, to);
-//            if (friends.iterator().hasNext()) return friends;
-//        }
-//        return personRepository.findPathByQuery(from, to);
-//    }
-//
-//    protected List<Person> savePersonFriends(String id) {
-//        UserXtrCounters userById = vkService.getUserById(id);
-//        Person user = new Person(userById.getId(), userById.getFirstName(), userById.getLastName());
-//
-//        List<Person> friends = vkService.findPersonFriends(id);
-//        if(friends != null){
-//            friends.forEach(user::friendOf);
-//            System.out.println(user.getVkId());
-//            personRepository.save(user);
-//            return friends;
-//        } else {
-//            return new ArrayList<>();
-//        }
-//    }
-//}
+package com.eltech.sh.service;
+
+import com.eltech.sh.model.Person;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+
+@Service
+public class HandshakeService {
+
+    private final VKService vkService;
+    private Set<Integer> visited;
+    private Queue<Integer> toVisit;
+    private Map<Integer, List<Integer>> data;
+    private final SimpMessagingTemplate simpMessagingTemplate;
+    private final CSVService csvService;
+    private final DBService dbService;
+
+    @Autowired
+    public HandshakeService(VKService vkService, SimpMessagingTemplate simpMessagingTemplate, CSVService csvService, DBService dbService) {
+        this.vkService = vkService;
+        this.simpMessagingTemplate = simpMessagingTemplate;
+        this.csvService = csvService;
+        this.dbService = dbService;
+    }
+
+    public List<Person> checkSixHandshakes(String from, String to) {
+        toVisit = new LinkedList<>();
+        visited = new HashSet<>(10000);
+        data = new HashMap<>();
+
+        Integer origIdFrom = vkService.getPersonIntegerIdByStringId(from);
+        Integer origIdTo = vkService.getPersonIntegerIdByStringId(to);
+
+        toVisit.add(origIdFrom);
+        toVisit.add(origIdTo);
+
+        List<Integer> nodeIds = findPath(origIdFrom, origIdTo);
+        return vkService.getPersonsByIds(nodeIds);
+    }
+
+    private List<Integer> findPath(int from, int to) {
+        Queue<Integer> nextLevel = new LinkedList<>();
+        Date startTime = new Date();
+
+        for (int i = 0; i < 3; i++) {
+            notify("STARTED ITERATION# " + i);
+            while (!toVisit.isEmpty()) {
+                notify("PEOPLE TO CHECK " + toVisit.size());
+                Integer cur = toVisit.poll();
+                if (!visited.contains(cur)) {
+
+                    List<Integer> friendIds = findAndSavePersonFriends(cur.toString());
+                    visited.add(cur);
+
+                    for (Integer id : friendIds) {
+                        if (!visited.contains(id)) {
+                            nextLevel.add(id);
+                        }
+                    }
+                }
+            }
+            toVisit.addAll(nextLevel);
+            nextLevel.clear();
+            notify("SAVING FRIENDS TO NEO4J");
+            csvService.save(data);
+            notify("MIGRATION TO DB");
+            dbService.migrateToDB();
+            notify("MIGRATION TO DB IS OVER");
+            data.clear();
+
+            notify("FINDING PATH");
+            List<Integer> nodeIds = dbService.findPathByQuery(from, to);
+            if (!nodeIds.isEmpty()) {
+                notify("PATH IS FOUND: " + new Date(new Date().getTime() - startTime.getTime()));
+                //FIXME we need to clear file after each iteration but there is an exception when we do it
+                csvService.deleteCSV();
+                return nodeIds;
+            } else {
+                notify("THERE IS NO PATH YET");
+                csvService.deleteCSV();
+            }
+        }
+        return dbService.findPathByQuery(from, to);
+    }
+
+    private List<Integer> findAndSavePersonFriends(String userId) {
+        Integer id = vkService.getPersonIntegerIdByStringId(userId);
+
+        notify("REQUESTING FRIENDS OF USER #" + id);
+        List<Integer> friendIds = vkService.findIdsOfPersonFriends(id);
+
+        if (friendIds != null) {
+            data.put(id, friendIds);
+            notify("RESPONSE: " + friendIds.size() + " FRIENDS");
+            return friendIds;
+        } else {
+            notify("RESPONSE: " + 0 + " FRIENDS (USER IS BANNED OR SMTH ELSE)");
+            return new ArrayList<>();
+        }
+
+    }
+
+    private void notify(String msg) {
+//        System.out.println(msg);
+        simpMessagingTemplate.convertAndSend("/topic/status", msg);
+    }
+}

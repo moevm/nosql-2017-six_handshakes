@@ -23,10 +23,15 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter-data-neo4j",
+    compile(
             "org.springframework.boot:spring-boot-starter-web",
             "com.googlecode.json-simple:json-simple:1.1.1",
             "org.springframework.boot:spring-boot-starter-websocket",
-            "com.vk.api:sdk:0.5.8"
+            "com.vk.api:sdk:0.5.8",
+            'org.neo4j.driver:neo4j-java-driver:1.2.1',
+            'org.neo4j:neo4j-kernel:3.3.0-beta02',
+            'org.neo4j:neo4j-kernel-api:3.3.0-beta02',
+            'org.apache.commons:commons-csv:1.5'
+
     )
 }

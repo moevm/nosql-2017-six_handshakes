@@ -1,4 +1,3 @@
-import {UserInfo} from "./UserInfo";
 import React from "react";
 import {fetchUser} from "../actions/UserActions";
 import {connect} from 'react-redux';
@@ -6,6 +5,9 @@ import {StatusBar} from "./StatusBar";
 import Form from "./Form";
 import {Result} from "./Result";
 import "./style.css"
+import "../resources/css/imports.css"
+import {Header} from "./Header";
+import {ChartPanel} from "./ChartPanel";
 
 class App extends React.Component {
     componentDidMount() {
@@ -17,10 +19,12 @@ class App extends React.Component {
         const {user, graph, socket} = this.props;
 
         return (<div>
-            <UserInfo user = {user}/>
-            <Form socket={socket}/>
-            <StatusBar socket={socket}/>
-            <Result result = {graph}/>
+            <Header user={user}/>
+            <div className="main-wrapper">
+                <Form socket={socket}/>
+                <StatusBar socket={socket}/>
+                <Result result={graph}/>
+            </div>
         </div>)
     }
 }

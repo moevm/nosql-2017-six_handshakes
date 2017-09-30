@@ -1,8 +1,107 @@
 * {
-    font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
+    font-family: "Trebuchet MS", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Tahoma, sans-serif;
 }
 
-.sh-form input, button{
+.main-form {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.main-form > h3 {
+    font-size: 18px;
+}
+
+.main-form > div {
+    height: auto;
+    width: 20%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #5a595a;
+}
+
+.main-form > div.arrow {
+    width: 10%;
+}
+
+.main-form input, button {
     font-size: 16px;
-    margin: 5px;
+    padding: 5px;
+    margin-bottom: 5px;
+    border-width: 1px;
+    width: 80%;
+}
+
+.image-round {
+    width: 150px;
+    height: 150px;
+    background-position: center;
+    background-size: cover;
+    border-radius: 50%;
+}
+
+.header {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 50px;
+    color: white;
+    background-color: #605f60;
+    display: flex;
+    justify-content: space-between;
+}
+
+.header > div {
+    padding: 0 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: inherit;
+}
+
+.header div.image-round {
+    width: 40px;
+    height: 40px;
+    margin-left: 5px;
+}
+
+.main-wrapper {
+    width: 80%;
+    margin: 50px auto auto auto;
+}
+
+.icon-button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border: 1px solid gray;
+    border-radius: 5px;
+    padding: 5px;
+    transition: all .13s ease;
+    width: 80%;
+    margin-bottom: 5px;
+}
+
+.icon-button:hover {
+    cursor: pointer;
+    background-color: #bbbbbb;
+}
+
+.icon-button i {
+    margin-right: 5px;
+}
+
+.submit-button {
+    border: 1px solid gray;
+    padding: 10px;
+    transition: all .13s ease;
+    width: 80%;
+}
+
+.submit-button:hover{
+    cursor: pointer;
 }
