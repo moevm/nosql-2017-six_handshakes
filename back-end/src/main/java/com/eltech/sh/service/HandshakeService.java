@@ -1,5 +1,6 @@
 package com.eltech.sh.service;
 
+import com.eltech.sh.beans.TimeBean;
 import com.eltech.sh.model.Person;
 import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,6 @@ public class HandshakeService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final CSVService csvService;
     private final DBService dbService;
-    private Long peopleCount;
     private StopWatch vkTimer;
     private StopWatch dbTimer;
     private StopWatch pathTimer;
@@ -36,7 +36,6 @@ public class HandshakeService {
         toVisit = new LinkedList<>();
         visited = new HashSet<>(10000);
         data = new HashMap<>();
-        peopleCount = 2L;
         this.vkTimer = new StopWatch();
         this.dbTimer = new StopWatch();
         this.pathTimer = new StopWatch();
@@ -52,8 +51,16 @@ public class HandshakeService {
         toVisit.add(origIdTo);
 
         List<Integer> nodeIds = findPath(origIdFrom, origIdTo);
-        notify("DB: " + dbTimer.getTime() + " VK: " + vkTimer.getTime() + " PATH: " + pathTimer.getTime() +" SUMMARY: " + visited.size());
+        //notify("DB: " + dbTimer.getTime() + " VK: " + vkTimer.getTime() + " PATH: " + pathTimer.getTime() + " SUMMARY: " + visited.size());
         return vkService.getPersonsByIds(nodeIds);
+    }
+
+    public TimeBean getTimerValues() {
+        return new TimeBean(dbTimer.getTime(), vkTimer.getTime(), pathTimer.getTime());
+    }
+
+    public Integer getPeopleCount() {
+        return visited.size();
     }
 
     private List<Integer> findPath(int from, int to) {
@@ -78,6 +85,7 @@ public class HandshakeService {
                     }
                 }
             }
+
             toVisit.addAll(nextLevel);
             nextLevel.clear();
 
