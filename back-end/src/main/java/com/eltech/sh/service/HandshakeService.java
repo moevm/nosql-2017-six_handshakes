@@ -63,6 +63,10 @@ public class HandshakeService {
         return visited.size();
     }
 
+    public Integer getCurrentWeb(){
+        return dbService.countPeople(1);
+    }
+
     private List<Integer> findPath(int from, int to) {
 
         Queue<Integer> nextLevel = new LinkedList<>();
