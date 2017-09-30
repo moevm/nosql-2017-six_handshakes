@@ -1,6 +1,7 @@
 package com.eltech.sh.service;
 
 import com.eltech.sh.model.Person;
+import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -17,19 +18,32 @@ public class HandshakeService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final CSVService csvService;
     private final DBService dbService;
+    private Long peopleCount;
+    private StopWatch vkTimer;
+    private StopWatch dbTimer;
+    private StopWatch pathTimer;
 
     @Autowired
-    public HandshakeService(VKService vkService, SimpMessagingTemplate simpMessagingTemplate, CSVService csvService, DBService dbService) {
+    public HandshakeService(VKService vkService, SimpMessagingTemplate simpMessagingTemplate, CSVService csvService, DBService dbService /*,
+                           /* StopWatch vkTimer, StopWatch dbTimer, StopWatch pathTimer */) {
         this.vkService = vkService;
         this.simpMessagingTemplate = simpMessagingTemplate;
         this.csvService = csvService;
         this.dbService = dbService;
     }
 
-    public List<Person> checkSixHandshakes(String from, String to) {
+    private void init() {
         toVisit = new LinkedList<>();
         visited = new HashSet<>(10000);
         data = new HashMap<>();
+        peopleCount = 2L;
+        this.vkTimer = new StopWatch();
+        this.dbTimer = new StopWatch();
+        this.pathTimer = new StopWatch();
+    }
+
+    public List<Person> checkSixHandshakes(String from, String to) {
+        init();
 
         Integer origIdFrom = vkService.getPersonIntegerIdByStringId(from);
         Integer origIdTo = vkService.getPersonIntegerIdByStringId(to);
@@ -38,10 +52,12 @@ public class HandshakeService {
         toVisit.add(origIdTo);
 
         List<Integer> nodeIds = findPath(origIdFrom, origIdTo);
+        notify("DB: " + dbTimer.getTime() + " VK: " + vkTimer.getTime() + " PATH: " + pathTimer.getTime() +" SUMMARY: " + visited.size());
         return vkService.getPersonsByIds(nodeIds);
     }
 
     private List<Integer> findPath(int from, int to) {
+
         Queue<Integer> nextLevel = new LinkedList<>();
         Date startTime = new Date();
 
@@ -64,18 +80,32 @@ public class HandshakeService {
             }
             toVisit.addAll(nextLevel);
             nextLevel.clear();
+
+            if (dbTimer.isSuspended()) {
+                dbTimer.resume();
+            } else {
+                dbTimer.start();
+            }
             notify("SAVING FRIENDS TO NEO4J");
             csvService.save(data);
+
             notify("MIGRATION TO DB");
             dbService.migrateToDB();
             notify("MIGRATION TO DB IS OVER");
+            dbTimer.suspend();
             data.clear();
 
             notify("FINDING PATH");
+            if (pathTimer.isSuspended()) {
+                pathTimer.resume();
+            } else {
+                pathTimer.start();
+            }
             List<Integer> nodeIds = dbService.findPathByQuery(from, to);
+            pathTimer.suspend();
             if (!nodeIds.isEmpty()) {
                 notify("PATH IS FOUND: " + new Date(new Date().getTime() - startTime.getTime()));
-                //FIXME we need to clear file after each iteration but there is an exception when we do it
+
                 csvService.deleteCSV();
                 return nodeIds;
             } else {
@@ -87,11 +117,18 @@ public class HandshakeService {
     }
 
     private List<Integer> findAndSavePersonFriends(String userId) {
+        if (vkTimer.isSuspended()) {
+            vkTimer.resume();
+        } else {
+            vkTimer.start();
+        }
+
         Integer id = vkService.getPersonIntegerIdByStringId(userId);
+
 
         notify("REQUESTING FRIENDS OF USER #" + id);
         List<Integer> friendIds = vkService.findIdsOfPersonFriends(id);
-
+        vkTimer.suspend();
         if (friendIds != null) {
             data.put(id, friendIds);
             notify("RESPONSE: " + friendIds.size() + " FRIENDS");
@@ -100,11 +137,9 @@ public class HandshakeService {
             notify("RESPONSE: " + 0 + " FRIENDS (USER IS BANNED OR SMTH ELSE)");
             return new ArrayList<>();
         }
-
     }
 
     private void notify(String msg) {
-//        System.out.println(msg);
         simpMessagingTemplate.convertAndSend("/topic/status", msg);
     }
 }

@@ -52,14 +52,15 @@ public class VKService {
 
         while (true) {
             try {
-                UserXtrCounters user = vkApiClient.users().get(getUserActor()).userIds(id).unsafeParam("fields", "photo_400_orig").execute().get(0);
+                UserXtrCounters user = vkApiClient.users().get(getUserActor())
+                        .userIds(id).unsafeParam("fields", "photo_400_orig").execute().get(0);
                 System.out.println(user);
                 return new Person(user.getId(), user.getFirstName(), user.getLastName(), user.getPhoto400Orig());
             } catch (ApiTooManyException e) {
                 try {
                     Thread.sleep(400);
                 } catch (InterruptedException e1) {
-                    e1.printStackTrace();
+                    // e1.printStackTrace();
                 }
             } catch (ApiException | ClientException e) {
                 System.out.println("Reset request [getPersonByStringId]");
@@ -76,7 +77,7 @@ public class VKService {
             return objectMapper.convertValue(jsonNode, new TypeReference<List<Integer>>() {
             });
         } catch (ClientException | IOException e) {
-            e.printStackTrace();
+            //  e.printStackTrace();
         }
         return null;
     }
@@ -87,7 +88,7 @@ public class VKService {
             try {
                 List<UserXtrCounters> list = vkApiClient.users().get(getUserActor()).unsafeParam("user_id", userId).unsafeParam("fields", "photo_400_orig").execute();
                 return list.get(0).getPhoto400Orig();
-        } catch (ApiTooManyException e) {
+            } catch (ApiTooManyException e) {
                 try {
                     Thread.sleep(400);
                 } catch (InterruptedException e1) {
@@ -109,8 +110,9 @@ public class VKService {
             return objectMapper.convertValue(jsonNode, new TypeReference<List<Person>>() {
             });
         } catch (ClientException | IOException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
+
         return null;
     }
 
