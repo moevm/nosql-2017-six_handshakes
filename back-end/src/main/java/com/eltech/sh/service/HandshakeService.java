@@ -22,6 +22,7 @@ public class HandshakeService {
     private StopWatch vkTimer;
     private StopWatch dbTimer;
     private StopWatch pathTimer;
+    private StopWatch csvTimer;
 
     @Autowired
     public HandshakeService(VKService vkService, SimpMessagingTemplate simpMessagingTemplate, CSVService csvService, DBService dbService /*,
@@ -39,6 +40,7 @@ public class HandshakeService {
         this.vkTimer = new StopWatch();
         this.dbTimer = new StopWatch();
         this.pathTimer = new StopWatch();
+        this.csvTimer = new StopWatch();
     }
 
     public List<Person> checkSixHandshakes(String from, String to) {
@@ -51,7 +53,6 @@ public class HandshakeService {
         toVisit.add(origIdTo);
 
         List<Integer> nodeIds = findPath(origIdFrom, origIdTo);
-        //notify("DB: " + dbTimer.getTime() + " VK: " + vkTimer.getTime() + " PATH: " + pathTimer.getTime() + " SUMMARY: " + visited.size());
         return vkService.getPersonsByIds(nodeIds);
     }
 
@@ -63,7 +64,7 @@ public class HandshakeService {
         return visited.size();
     }
 
-    public Integer getCurrentWeb(){
+    public Integer getCurrentWeb() {
         return dbService.countPeople(1);
     }
 
@@ -92,15 +93,13 @@ public class HandshakeService {
 
             toVisit.addAll(nextLevel);
             nextLevel.clear();
+            startTimer(csvTimer);
 
-            if (dbTimer.isSuspended()) {
-                dbTimer.resume();
-            } else {
-                dbTimer.start();
-            }
             notify("SAVING FRIENDS TO NEO4J");
             csvService.save(data);
+            csvTimer.suspend();
 
+            startTimer(dbTimer);
             notify("MIGRATION TO DB");
             dbService.migrateToDB();
             notify("MIGRATION TO DB IS OVER");
@@ -108,13 +107,10 @@ public class HandshakeService {
             data.clear();
 
             notify("FINDING PATH");
-            if (pathTimer.isSuspended()) {
-                pathTimer.resume();
-            } else {
-                pathTimer.start();
-            }
+            startTimer(pathTimer);
             List<Integer> nodeIds = dbService.findPathByQuery(from, to);
             pathTimer.suspend();
+
             if (!nodeIds.isEmpty()) {
                 notify("PATH IS FOUND: " + new Date(new Date().getTime() - startTime.getTime()));
 
@@ -128,12 +124,16 @@ public class HandshakeService {
         return dbService.findPathByQuery(from, to);
     }
 
-    private List<Integer> findAndSavePersonFriends(String userId) {
-        if (vkTimer.isSuspended()) {
-            vkTimer.resume();
+    private void startTimer(StopWatch timer) {
+        if (timer.isSuspended()) {
+            timer.resume();
         } else {
-            vkTimer.start();
+            timer.start();
         }
+    }
+
+    private List<Integer> findAndSavePersonFriends(String userId) {
+        startTimer(vkTimer);
 
         Integer id = vkService.getPersonIntegerIdByStringId(userId);
 

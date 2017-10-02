@@ -4,11 +4,13 @@ public class TimeBean {
     private Long dbTime;
     private Long vkTime;
     private Long pathTime;
+    private Long csvTime;
 
-    public TimeBean(Long dbTime, Long vkTime, Long pathTime) {
+    public TimeBean(Long dbTime, Long vkTime, Long pathTime, Long csvTime) {
         this.dbTime = dbTime;
         this.vkTime = vkTime;
         this.pathTime = pathTime;
+        this.csvTime = csvTime;
     }
 
     public Long getDbTime() {
@@ -33,5 +35,13 @@ public class TimeBean {
 
     public void setPathTime(Long pathTime) {
         this.pathTime = pathTime;
+    }
+
+    public Long getCsvTime() {
+        return csvTime;
+    }
+
+    public void setCsvTime(Long csvTime) {
+        this.csvTime = csvTime;
     }
 }
