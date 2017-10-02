@@ -41,6 +41,19 @@ public class DBService {
         return resultIds;
     }
 
+    public List<Integer> findWebByQuery(Integer from, Integer to) {
+        StatementResult result = session.run(
+                "MATCH (from:Person {vkId:{from}}),(to:Person {vkId:{to}}), path = allShortestPaths((from)-[:FRIEND*..5]-(to)) RETURN path",
+                parameters("from", from, "to", to));
+
+        List<Integer> resultIds = new ArrayList<>();
+//think about it
+        if (result.hasNext()) {
+            result.next().get(0).asPath().nodes().forEach(node -> resultIds.add(node.get("vkId").asInt()));
+        }
+        return resultIds;
+    }
+
     public Integer countPeople(Integer owner) {
         StatementResult result = session.run(
                 "MATCH (person) RETURN count (person)");

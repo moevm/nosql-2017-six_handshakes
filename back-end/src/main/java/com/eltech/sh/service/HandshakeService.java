@@ -23,6 +23,7 @@ public class HandshakeService {
     private StopWatch dbTimer;
     private StopWatch pathTimer;
     private StopWatch csvTimer;
+    private Integer peopleCount;
 
     @Autowired
     public HandshakeService(VKService vkService, SimpMessagingTemplate simpMessagingTemplate, CSVService csvService, DBService dbService /*,
@@ -41,6 +42,7 @@ public class HandshakeService {
         this.dbTimer = new StopWatch();
         this.pathTimer = new StopWatch();
         this.csvTimer = new StopWatch();
+        peopleCount = 0;
     }
 
     public List<Person> checkSixHandshakes(String from, String to) {
@@ -57,11 +59,11 @@ public class HandshakeService {
     }
 
     public TimeBean getTimerValues() {
-        return new TimeBean(dbTimer.getTime(), vkTimer.getTime(), pathTimer.getTime());
+        return new TimeBean(dbTimer.getTime(), vkTimer.getTime(), pathTimer.getTime(), csvTimer.getTime());
     }
 
     public Integer getPeopleCount() {
-        return visited.size();
+        return peopleCount;
     }
 
     public Integer getCurrentWeb() {
@@ -69,7 +71,6 @@ public class HandshakeService {
     }
 
     private List<Integer> findPath(int from, int to) {
-
         Queue<Integer> nextLevel = new LinkedList<>();
         Date startTime = new Date();
 
@@ -80,7 +81,9 @@ public class HandshakeService {
                 Integer cur = toVisit.poll();
                 if (!visited.contains(cur)) {
 
+                    startTimer(vkTimer);
                     List<Integer> friendIds = findAndSavePersonFriends(cur.toString());
+                    vkTimer.suspend();
                     visited.add(cur);
 
                     for (Integer id : friendIds) {
@@ -93,8 +96,8 @@ public class HandshakeService {
 
             toVisit.addAll(nextLevel);
             nextLevel.clear();
-            startTimer(csvTimer);
 
+            startTimer(csvTimer);
             notify("SAVING FRIENDS TO NEO4J");
             csvService.save(data);
             csvTimer.suspend();
@@ -104,7 +107,9 @@ public class HandshakeService {
             dbService.migrateToDB();
             notify("MIGRATION TO DB IS OVER");
             dbTimer.suspend();
+            startTimer(csvTimer);
             data.clear();
+            csvTimer.suspend();
 
             notify("FINDING PATH");
             startTimer(pathTimer);
@@ -113,12 +118,15 @@ public class HandshakeService {
 
             if (!nodeIds.isEmpty()) {
                 notify("PATH IS FOUND: " + new Date(new Date().getTime() - startTime.getTime()));
-
+                startTimer(csvTimer);
                 csvService.deleteCSV();
+                csvTimer.suspend();
                 return nodeIds;
             } else {
                 notify("THERE IS NO PATH YET");
+                startTimer(csvTimer);
                 csvService.deleteCSV();
+                csvTimer.suspend();
             }
         }
         return dbService.findPathByQuery(from, to);
@@ -133,14 +141,12 @@ public class HandshakeService {
     }
 
     private List<Integer> findAndSavePersonFriends(String userId) {
-        startTimer(vkTimer);
-
+        peopleCount++;
         Integer id = vkService.getPersonIntegerIdByStringId(userId);
-
 
         notify("REQUESTING FRIENDS OF USER #" + id);
         List<Integer> friendIds = vkService.findIdsOfPersonFriends(id);
-        vkTimer.suspend();
+
         if (friendIds != null) {
             data.put(id, friendIds);
             notify("RESPONSE: " + friendIds.size() + " FRIENDS");
