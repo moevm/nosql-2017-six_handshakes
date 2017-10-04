@@ -28,7 +28,9 @@ class App extends React.Component {
                     <StatusBar socket={socket} loading={loading}/>
                     <Result result={graph}/>
                 </div>
-                <GraphWeb/>
+                <GraphWeb
+                    data={graph}
+                />
             </div>
         )
     }

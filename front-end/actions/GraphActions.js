@@ -13,7 +13,7 @@ export const setGraph = payload => {
 function fetchSearchSuccess(json) {
     return dispatch => {
         dispatch(fetchSuccess());
-        dispatch(setGraph(json));
+        dispatch(setGraph(json.graph));
     }
 }
 
