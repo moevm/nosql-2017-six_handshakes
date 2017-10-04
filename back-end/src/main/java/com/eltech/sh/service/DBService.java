@@ -22,10 +22,6 @@ public class DBService {
     public void migrateToDB() {
         session.run("CREATE CONSTRAINT ON (person:Person) ASSERT person.vkId IS UNIQUE");
 
-        /*session.run("LOAD CSV FROM 'file:///data.csv' AS line\n" +
-                "MERGE (from:Person { vkId: toInt(line[0])})\n" +
-                "MERGE (to:Person { vkId: toInt(line[1])})\n" +
-                "MERGE ((from)-[:FRIEND]-(to))");*/
         session.run("LOAD CSV FROM 'http://localhost:8080/csv' AS line\n" +
                 "MERGE (from:Person { vkId: toInt(line[0])})\n" +
                 "MERGE (to:Person { vkId: toInt(line[1])})\n" +
@@ -39,9 +35,29 @@ public class DBService {
 
         List<Integer> resultIds = new ArrayList<>();
 
-        if (result.hasNext()){
+        if (result.hasNext()) {
             result.next().get(0).asPath().nodes().forEach(node -> resultIds.add(node.get("vkId").asInt()));
         }
         return resultIds;
+    }
+
+    public List<Integer> findWebByQuery(Integer from, Integer to) {
+        StatementResult result = session.run(
+                "MATCH (from:Person {vkId:{from}}),(to:Person {vkId:{to}}), path = allShortestPaths((from)-[:FRIEND*..5]-(to)) RETURN path",
+                parameters("from", from, "to", to));
+
+        List<Integer> resultIds = new ArrayList<>();
+//think about it
+        if (result.hasNext()) {
+            result.next().get(0).asPath().nodes().forEach(node -> resultIds.add(node.get("vkId").asInt()));
+        }
+        return resultIds;
+    }
+
+    public Integer countPeople(Integer owner) {
+        StatementResult result = session.run(
+                "MATCH (person) RETURN count (person)");
+
+        return result.single().get(0).asInt();
     }
 }

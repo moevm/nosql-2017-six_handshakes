@@ -1,5 +1,7 @@
 package com.eltech.sh.controller;
 
+import com.eltech.sh.beans.ResponseBean;
+import com.eltech.sh.beans.TimeBean;
 import com.eltech.sh.model.Person;
 import com.eltech.sh.service.HandshakeService;
 import com.eltech.sh.service.VKService;
@@ -32,8 +34,11 @@ public class PersonController {
     }
 
     @GetMapping("/find")
-    List<Person> checkSixHandshakes(@RequestParam("from") String fromId, @RequestParam("to") String toId) {
+    ResponseBean checkSixHandshakes(@RequestParam("from") String fromId, @RequestParam("to") String toId) {
         List<Person> list = handshakeService.checkSixHandshakes(fromId, toId);
-        return list;
+        TimeBean timeBean = handshakeService.getTimerValues();
+        Integer peopleCount = handshakeService.getPeopleCount();
+        Integer web  = handshakeService.getCurrentWeb();
+        return new ResponseBean(list, timeBean, peopleCount, web);
     }
 }
