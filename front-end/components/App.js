@@ -9,6 +9,7 @@ import "../resources/css/imports.css"
 import "./Core.css"
 import {Header} from "./Header";
 import {ChartPanel} from "./ChartPanel";
+import GraphWeb from "./GraphWeb";
 
 class App extends React.Component {
     componentDidMount() {
@@ -19,14 +20,17 @@ class App extends React.Component {
 
         const {user, graph, socket, loading} = this.props;
 
-        return (<div>
-            <Header user={user}/>
-            <div className="main-wrapper">
-                <Form socket={socket}/>
-                <StatusBar socket={socket} loading={loading}/>
-                <Result result={graph}/>
+        return (
+            <div>
+                <Header user={user}/>
+                <div className="main-wrapper">
+                    <Form socket={socket}/>
+                    <StatusBar socket={socket} loading={loading}/>
+                    <Result result={graph}/>
+                </div>
+                <GraphWeb/>
             </div>
-        </div>)
+        )
     }
 }
 
