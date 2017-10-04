@@ -39,6 +39,6 @@ public class PersonController {
         TimeBean timeBean = handshakeService.getTimerValues();
         Integer peopleCount = handshakeService.getPeopleCount();
         Integer web  = handshakeService.getCurrentWeb();
-        return new ResponseBean(list, timeBean, peopleCount, web);
+        return new ResponseBean(list, handshakeService.findAllPaths(fromId,toId),timeBean, peopleCount, web);
     }
 }

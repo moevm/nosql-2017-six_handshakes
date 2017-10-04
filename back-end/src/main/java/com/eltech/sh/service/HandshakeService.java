@@ -71,6 +71,16 @@ public class HandshakeService {
         return dbService.countPeople(1);
     }
 
+    public List<List<Person>> findAllPaths(String from, String to) {
+        List<List<Integer>> lists = dbService.findWebByQuery(vkService.getPersonIntegerIdByStringId(from),
+                vkService.getPersonIntegerIdByStringId(to));
+        List<List<Person>> people = new ArrayList<>();
+        for (List<Integer> curIds : lists) {
+            people.add(vkService.getPersonsByIds(curIds));
+        }
+        return people;
+    }
+
     private List<Integer> findPath(int from, int to) {
         Queue<Integer> nextLevel = new LinkedList<>();
         Date startTime = new Date();
@@ -84,10 +94,9 @@ public class HandshakeService {
                 Integer cur = toVisit.poll();
                 currFriendIds.add(cur);
                 visited.add(cur);
-                if(currFriendIds.size() == 24)
-                {
+                if (currFriendIds.size() == 24) {
                     startTimer(vkTimer);
-                    List<Integer>  friendIds = vkService.getFriendsByIds(currFriendIds);
+                    List<Integer> friendIds = vkService.getFriendsByIds(currFriendIds);
                     vkTimer.suspend();
                     currFriendIds.clear();
                     for (Integer id : friendIds) {
@@ -97,10 +106,9 @@ public class HandshakeService {
                     }
                 }
             }
-            if(currFriendIds.size() != 0)
-            {
+            if (currFriendIds.size() != 0) {
                 startTimer(vkTimer);
-                List<Integer>  friendIds = vkService.getFriendsByIds(currFriendIds);
+                List<Integer> friendIds = vkService.getFriendsByIds(currFriendIds);
                 vkTimer.suspend();
                 currFriendIds.clear();
                 for (Integer id : friendIds) {
