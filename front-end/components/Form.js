@@ -4,12 +4,12 @@ import {handleFormSubmit} from "../actions/GraphActions";
 import "./Form.css"
 import {connect} from "react-redux";
 let Form = props => {
-    const {handleSubmit, socket: {socketState, searchState}, setDataSource, formValues: {dataSource}} = props;
-    const disabled = socketState !== 'CONNECTED' || searchState.length !== 0;
+    const {handleSubmit, socket: {socketState, searchState}, setDataSource, formValues: {dataSource, from, to}} = props;
+    const disabled = !from || !to || socketState !== 'CONNECTED' || searchState.length !== 0;
     return (
         <form className="main-form" onSubmit={handleSubmit}>
-            <div>
-                <h3>Choose data source</h3>
+            <h3>Choose data source</h3>
+            <div className="row">
                 <div className={`icon-button vk ${dataSource === 'VK' ? 'active' : ''}`}
                      onClick={() => setDataSource('VK')}>
                     <i className="fa fa-vk "/>
@@ -21,24 +21,14 @@ let Form = props => {
                     your data
                 </div>
             </div>
-            <div className="arrow">
-                <i className="fa fa-long-arrow-right fa-2x"/>
+
+            <h3>Enter IDs</h3>
+            <div className="row">
+                <Field name="from" component="input" type="text" placeholder="from"/>
+                <Field name="to" component="input" type="text" placeholder="to"/>
             </div>
-            <div>
-                <h3>Enter IDs</h3>
-                <div>
-                    <Field name="from" component="input" type="text" placeholder="from"/>
-                </div>
-                <div>
-                    <Field name="to" component="input" type="text" placeholder="to"/>
-                </div>
-            </div>
-            <div className="arrow">
-                <i className="fa fa-long-arrow-right fa-2x"/>
-            </div>
-            <div>
-                <button className="submit-button" type="submit" disabled={disabled}>Check!</button>
-            </div>
+
+            <button className={`submit-button ${(disabled) ? 'disabled' : ''}`} type="submit" disabled={disabled}>Check</button>
         </form>
     )
 };

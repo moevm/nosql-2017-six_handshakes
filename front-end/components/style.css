@@ -1,3 +1,15 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    height: 100%;
+}
+
+body, #root, #root > div {
+    height: inherit;
+}
 
 .image-round {
     width: 150px;
@@ -8,21 +20,22 @@
 }
 
 .main-wrapper {
-    width: 80%;
-    margin: 50px auto auto auto;
+    height: calc(100% - 50px);
+    padding: 50px 10% 0 10%;
+    text-align: center;
+
+    background: url(http://topnewsfromworld.ml/gallery_gen/1f69524378190c17607ea96d27bfd04a_7325x4120.jpg) no-repeat center;
+    background-size: cover;
 }
 
-.icon-button{
+.icon-button {
     opacity: 0.5;
     color: white;
     display: flex;
     flex-direction: row;
     align-items: center;
     border-radius: 5px;
-    padding: 10px;
     transition: all .10s ease;
-    width: 80%;
-    margin-bottom: 5px;
     background: gray;
 }
 

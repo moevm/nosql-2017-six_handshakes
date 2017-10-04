@@ -1,34 +1,41 @@
+@keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+
 .main-form {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
+    width: 30%;
+    margin: 50px auto 0 auto;
+    background: rgba(230, 229, 229, 0.5);
+    padding: 30px;
+
+    animation: fadein 0.5s;
 }
 
 .main-form > h3 {
+    color: #64727e;
     font-size: 18px;
+    font-family: 'Source Sans Pro Regular', Arial, sans-serif;
+    margin-bottom: 10px;
 }
 
 .main-form > div {
-    height: auto;
-    width: 20%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
     color: #5a595a;
 }
 
-.main-form > div.arrow {
-    width: 10%;
+.main-form .row{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 20px;
 }
 
-.main-form input, button {
+.main-form .row input, .icon-button {
     font-size: 16px;
-    padding: 5px;
-    margin-bottom: 5px;
+    padding: 10px;
     border-width: 1px;
-    width: 80%;
+    width: 40%;
 }
 
 .main-form input{
@@ -42,15 +49,27 @@
 }
 
 .submit-button {
-    border: 1px solid gray;
     padding: 10px;
-    transition: all .13s ease;
-    width: 80%;
-    background: transparent;
-    text-transform: uppercase;
-    font-weight: bold;
+    transition: all .10s ease;
+    width: 100%;
+    font-family: 'Source Sans Pro Regular', Arial, sans-serif;
+    border: 0;
+    color: white;
+    background: #8395a6;
+    font-size: 20px;
+    margin-top: 10px;
 }
 
 .submit-button:hover {
     cursor: pointer;
+    background: #567592;
+}
+
+
+.submit-button.disabled {
+    background: #d0cccc;
+}
+
+.submit-button.disabled:hover{
+    cursor: default;
 }
