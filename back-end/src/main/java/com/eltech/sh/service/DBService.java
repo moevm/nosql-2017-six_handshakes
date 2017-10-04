@@ -1,12 +1,19 @@
 package com.eltech.sh.service;
 
+import com.eltech.sh.beans.Edge;
+import com.eltech.sh.beans.GraphBean;
+import javafx.util.Pair;
+import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.Session;
 import org.neo4j.driver.v1.StatementResult;
+import org.neo4j.driver.v1.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.neo4j.driver.v1.Values.parameters;
 
@@ -41,18 +48,26 @@ public class DBService {
         return resultIds;
     }
 
-    public List<List<Integer>> findWebByQuery(Integer from, Integer to) {
+    public Pair<List<Edge>, List<Integer>> findWebByQuery(Integer from, Integer to) {
         StatementResult result = session.run(
                 "MATCH (from:Person {vkId:{from}}),(to:Person {vkId:{to}}), path = allShortestPaths((from)-[:FRIEND*..5]-(to)) RETURN path",
                 parameters("from", from, "to", to));
 
-        List<List<Integer>> paths = new ArrayList<>();
+        List<Edge> relations = new ArrayList<>();
+        Map<Long, Integer> nodes = new HashMap<>();
+
         while (result.hasNext()) {
-            List<Integer> curPath = new ArrayList<>();
-            result.next().get(0).asPath().nodes().forEach(node -> curPath.add(node.get("vkId").asInt()));
-            paths.add(curPath);
+            Value cur = result.next().get(0);
+            cur.asPath().nodes().forEach(node -> nodes.put(node.id(), node.get("vkId").asInt()));
+            cur.asPath().relationships().forEach(rel -> relations.add(new Edge(nodes.get(rel.startNodeId()), nodes.get(rel.endNodeId()))));
         }
-        return paths;
+
+        List<Integer> ids = new ArrayList<>();
+        for (Long idx : nodes.keySet()) {
+            ids.add(nodes.get(idx));
+        }
+
+        return new Pair(relations, ids);
     }
 
     public Integer countPeople(Integer owner) {

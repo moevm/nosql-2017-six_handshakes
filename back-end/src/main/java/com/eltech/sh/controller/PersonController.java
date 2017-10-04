@@ -38,7 +38,7 @@ public class PersonController {
         List<Person> list = handshakeService.checkSixHandshakes(fromId, toId);
         TimeBean timeBean = handshakeService.getTimerValues();
         Integer peopleCount = handshakeService.getPeopleCount();
-        Integer web  = handshakeService.getCurrentWeb();
-        return new ResponseBean(list, handshakeService.findAllPaths(fromId,toId),timeBean, peopleCount, web);
+        Integer web = handshakeService.getCurrentWeb();
+        return new ResponseBean(list, handshakeService.findAllPaths(fromId, toId), timeBean, peopleCount, web);
     }
 }
