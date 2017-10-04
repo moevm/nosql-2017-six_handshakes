@@ -1,0 +1,75 @@
+@keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+
+.main-form {
+    width: 30%;
+    margin: 50px auto 0 auto;
+    background: rgba(230, 229, 229, 0.5);
+    padding: 30px;
+
+    animation: fadein 0.5s;
+}
+
+.main-form > h3 {
+    color: #64727e;
+    font-size: 18px;
+    font-family: 'Source Sans Pro Regular', Arial, sans-serif;
+    margin-bottom: 10px;
+}
+
+.main-form > div {
+    color: #5a595a;
+}
+
+.main-form .row{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.main-form .row input, .icon-button {
+    font-size: 16px;
+    padding: 10px;
+    border-width: 1px;
+    width: 40%;
+}
+
+.main-form input{
+    border: 1px solid gainsboro;
+    border-radius: 5px;
+    outline: 0;
+}
+
+.main-form input:focus{
+    border: 1px solid #8a878a;
+}
+
+.submit-button {
+    padding: 10px;
+    transition: all .10s ease;
+    width: 100%;
+    font-family: 'Source Sans Pro Regular', Arial, sans-serif;
+    border: 0;
+    color: white;
+    background: #8395a6;
+    font-size: 20px;
+    margin-top: 10px;
+}
+
+.submit-button:hover {
+    cursor: pointer;
+    background: #567592;
+}
+
+
+.submit-button.disabled {
+    background: #d0cccc;
+}
+
+.submit-button.disabled:hover{
+    cursor: default;
+}
