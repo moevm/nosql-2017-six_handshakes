@@ -6,6 +6,7 @@ import Form from "./Form";
 import {Result} from "./Result";
 import "./style.css"
 import "../resources/css/imports.css"
+import "./Core.css"
 import {Header} from "./Header";
 import {ChartPanel} from "./ChartPanel";
 
@@ -16,13 +17,13 @@ class App extends React.Component {
 
     render() {
 
-        const {user, graph, socket} = this.props;
+        const {user, graph, socket, loading} = this.props;
 
         return (<div>
             <Header user={user}/>
             <div className="main-wrapper">
                 <Form socket={socket}/>
-                <StatusBar socket={socket}/>
+                <StatusBar socket={socket} loading={loading}/>
                 <Result result={graph}/>
             </div>
         </div>)
@@ -34,7 +35,8 @@ export default connect(
         return {
             user: state.user,
             graph: state.graph,
-            socket: state.socket
+            socket: state.socket,
+            loading: state.loadingBar !== 0
         }
     },
     dispatch => {

@@ -1,5 +1,5 @@
 import React from "react";
-
+import "./Header.css"
 export class Header extends React.Component {
     render() {
         const {user: {firstName, lastName, photoUrl}} = this.props;
@@ -7,7 +7,7 @@ export class Header extends React.Component {
         return (
             <div className="header">
                 <div>
-                    <h2>SIX HANDSHAKES</h2>
+                    <h2 className="title">six handshakes</h2>
                 </div>
                 <div className="current-user-panel">
                     <h4>
