@@ -1,6 +1,7 @@
 package com.eltech.sh.service;
 
 import com.eltech.sh.model.Person;
+import com.google.gson.JsonElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -47,18 +48,31 @@ public class HandshakeService {
 
         for (int i = 0; i < 3; i++) {
             notify("STARTED ITERATION# " + i);
+
+            List<Integer> currFriendIds = new ArrayList<>();
             while (!toVisit.isEmpty()) {
                 notify("PEOPLE TO CHECK " + toVisit.size());
                 Integer cur = toVisit.poll();
-                if (!visited.contains(cur)) {
-
-                    List<Integer> friendIds = findAndSavePersonFriends(cur.toString());
-                    visited.add(cur);
-
+                currFriendIds.add(cur);
+                visited.add(cur);
+                if(currFriendIds.size() == 24)
+                {
+                    List<Integer>  friendIds = vkService.getFriendsByIds(currFriendIds);
+                    currFriendIds.clear();
                     for (Integer id : friendIds) {
                         if (!visited.contains(id)) {
                             nextLevel.add(id);
                         }
+                    }
+                }
+            }
+            if(currFriendIds.size() != 0)
+            {
+                List<Integer>  friendIds = vkService.getFriendsByIds(currFriendIds);
+                currFriendIds.clear();
+                for (Integer id : friendIds) {
+                    if (!visited.contains(id)) {
+                        nextLevel.add(id);
                     }
                 }
             }

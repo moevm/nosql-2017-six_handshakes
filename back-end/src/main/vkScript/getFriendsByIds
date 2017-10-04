@@ -1,12 +1,14 @@
+
+
 var idNum = API.users.get(
 {
-"user_ids":listId,
-"fields":"photo_50,city,verified",
+"user_ids":ids,
+"fields":"",
 "v":"5.68"
 })@.id;
+
 var str = [];
 var curr = 0;
-return idNum
 while (curr != idNum.length) {
 
         str.push( API.friends.get(

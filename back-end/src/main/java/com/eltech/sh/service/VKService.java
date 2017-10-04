@@ -6,8 +6,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.sun.javafx.scene.control.SizeLimitedList;
 import com.vk.api.sdk.actions.Friends;
+import com.vk.api.sdk.client.ClientResponse;
 import com.vk.api.sdk.client.TransportClient;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.UserActor;
@@ -17,11 +20,13 @@ import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.httpclient.HttpTransportClient;
 import com.vk.api.sdk.objects.UserAuthResponse;
 import com.vk.api.sdk.objects.users.UserXtrCounters;
+import org.json.simple.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -171,22 +176,34 @@ public class VKService {
         return code.toString();
     }
 
-    public JsonElement getFriends(String userIds)
+    public List<Integer> getFriendsByIds(List<Integer> friendIds)
     {
-        JsonElement jsonOfFriends=null;
+        String ids = new String();
+        ids = ids + friendIds.get(0).toString();
+        for(int i=1; i<friendIds.size(); i++)
+        {
+
+            ids = ids + ", " + friendIds.get(i).toString();
+        }
         try {
+            String vkScriptCode = readFileCode("src\\main\\vkScript\\getFriendsByIds");
 
-            String vkScriptCode = readFileCode("src\\main\\vkScript\\getFriedsCode");
-            jsonOfFriends = vkApiClient.execute().code(
-                    getUserActor(), "var listId = \"" + userIds + "\";"+ vkScriptCode
-            ).execute();
-
-        } catch (ApiException e) {
-            e.printStackTrace();
-        } catch (ClientException e) {
+            String response = vkApiClient.execute().code(
+                    getUserActor(), "var ids = \"" + ids + "\";" + vkScriptCode
+            ).executeAsRaw().getContent();
+            JsonNode jsonNode = objectMapper.readTree(response).path("response");
+            List<Integer> save = new ArrayList<>();
+            for (JsonNode curr: jsonNode) {
+                save.addAll(objectMapper.convertValue(curr.findValue("items"), new TypeReference<List<Integer>>() {
+                })) ;
+            }
+            return objectMapper.convertValue(jsonNode.findValue("items"), new TypeReference<List<Integer>>() {
+            });
+        } catch (ClientException | IOException e) {
             e.printStackTrace();
         }
-        return jsonOfFriends;
-
+        return null;
     }
+
+
 }
