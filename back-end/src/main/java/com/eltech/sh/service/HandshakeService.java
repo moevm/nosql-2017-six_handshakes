@@ -6,6 +6,9 @@ import com.eltech.sh.beans.Node;
 import com.eltech.sh.beans.TimeBean;
 import com.eltech.sh.model.Person;
 import javafx.util.Pair;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.gson.JsonElement;
 import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -95,34 +98,37 @@ public class HandshakeService {
         for (int i = 0; i < 3; i++) {
             notify("STARTED ITERATION# " + i);
 
+
             List<Integer> currFriendIds = new ArrayList<>();
             while (!toVisit.isEmpty()) {
                 notify("PEOPLE TO CHECK " + toVisit.size());
                 Integer cur = toVisit.poll();
                 currFriendIds.add(cur);
                 visited.add(cur);
-                if (currFriendIds.size() == 24) {
+                if(currFriendIds.size() == 24)
+                {
                     startTimer(vkTimer);
-                    List<Integer> friendIds = vkService.getFriendsByIds(currFriendIds);
+                    List<Integer>  friendIds = findAndSavePersonFriends(currFriendIds);
                     vkTimer.suspend();
-                    currFriendIds.clear();
                     for (Integer id : friendIds) {
                         if (!visited.contains(id)) {
                             nextLevel.add(id);
                         }
                     }
+                    currFriendIds.clear();
                 }
             }
-            if (currFriendIds.size() != 0) {
+            if(currFriendIds.size() != 0)
+            {
                 startTimer(vkTimer);
-                List<Integer> friendIds = vkService.getFriendsByIds(currFriendIds);
+                List<Integer>  friendIds = findAndSavePersonFriends(currFriendIds);
                 vkTimer.suspend();
-                currFriendIds.clear();
                 for (Integer id : friendIds) {
                     if (!visited.contains(id)) {
                         nextLevel.add(id);
                     }
                 }
+                currFriendIds.clear();
             }
 
             toVisit.addAll(nextLevel);
@@ -171,22 +177,26 @@ public class HandshakeService {
         }
     }
 
-    private List<Integer> findAndSavePersonFriends(String userId) {
-        peopleCount++;
-        Integer id = vkService.getPersonIntegerIdByStringId(userId);
-
-        notify("REQUESTING FRIENDS OF USER #" + id);
-        List<Integer> friendIds = vkService.findIdsOfPersonFriends(id);
-
-        if (friendIds != null) {
-            data.put(id, friendIds);
-            notify("RESPONSE: " + friendIds.size() + " FRIENDS");
-            return friendIds;
-        } else {
-            notify("RESPONSE: " + 0 + " FRIENDS (USER IS BANNED OR SMTH ELSE)");
-            return new ArrayList<>();
+    private List<Integer> findAndSavePersonFriends(List<Integer> userIds) {
+        peopleCount+=userIds.size();
+        notify("REQUESTING FRIENDS OF USERS #" + userIds);
+        JsonNode friendIds = vkService.getFriendsByIds(userIds);
+        List<Integer> save = new ArrayList<>();
+        int i=0;
+        for (JsonNode curr: friendIds) {
+            if(curr.size() > 0) {
+                List<Integer> saveNode = vkService.objectMapper.convertValue(curr.findValue("items"), new TypeReference<List<Integer>>() {
+                });
+                data.put(userIds.get(i), saveNode);
+                notify("RESPONSE: " + saveNode.size() + " FRIENDS");
+                i++;
+                save.addAll(saveNode);
+            } else {
+                notify("RESPONSE: " + 0 + " FRIENDS (USER IS BANNED OR SMTH ELSE)");
+                return new ArrayList<>();
+            }
         }
-
+        return save;
     }
 
     private void notify(String msg) {

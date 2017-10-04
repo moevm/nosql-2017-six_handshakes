@@ -37,7 +37,7 @@ public class VKService {
     private final VkCredentialsConfiguration configuration;
     private final VkApiClient vkApiClient;
     private final Friends friends;
-    private final ObjectMapper objectMapper;
+    public final ObjectMapper objectMapper;
 
     @Autowired
     public VKService(VkCredentialsConfiguration configuration,
@@ -178,9 +178,9 @@ public class VKService {
         return code.toString();
     }
 
-    public List<Integer> getFriendsByIds(List<Integer> friendIds)
+    public JsonNode getFriendsByIds(List<Integer> friendIds)
     {
-        String ids = new String();
+        String ids = "";
         ids = ids + friendIds.get(0).toString();
         for(int i=1; i<friendIds.size(); i++)
         {
@@ -194,13 +194,7 @@ public class VKService {
                     getUserActor(), "var ids = \"" + ids + "\";" + vkScriptCode
             ).executeAsRaw().getContent();
             JsonNode jsonNode = objectMapper.readTree(response).path("response");
-            List<Integer> save = new ArrayList<>();
-            for (JsonNode curr: jsonNode) {
-                save.addAll(objectMapper.convertValue(curr.findValue("items"), new TypeReference<List<Integer>>() {
-                })) ;
-            }
-            return objectMapper.convertValue(jsonNode.findValue("items"), new TypeReference<List<Integer>>() {
-            });
+            return jsonNode;
         } catch (ClientException | IOException e) {
             e.printStackTrace();
         }
