@@ -1,0 +1,23 @@
+.source-sans-regular {
+    font-family: 'Source Sans Pro Regular', Arial, sans-serif;
+}
+
+.source-sans-light {
+    font-family: 'Source Sans Pro Light', Arial, sans-serif;
+}
+
+.source-sans-bold {
+    font-family: 'Source Sans Pro Bold', Arial, sans-serif;
+}
+
+.source-sans-semibold {
+    font-family: 'Source Sans Pro Semibold', Arial, sans-serif;
+}
+
+.source-sans-italic {
+    font-family: 'Source Sans Pro Italic', Arial, sans-serif;
+}
+
+* {
+    font-family: 'Source Sans Pro Light', Arial, sans-serif;
+}
