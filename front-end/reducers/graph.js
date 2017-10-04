@@ -1,7 +1,9 @@
-const graph = (state = [], action) => {
+const graph = (state = {data: null}, action) => {
     switch (action.type) {
         case 'SET_GRAPH':
-            return action.payload;
+            return {
+                data: action.payload
+            };
         default:
             return state;
     }

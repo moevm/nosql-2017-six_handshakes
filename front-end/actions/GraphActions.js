@@ -14,7 +14,6 @@ function fetchSearchSuccess(json) {
     return dispatch => {
         dispatch(fetchSuccess());
         dispatch(setGraph(json.graph));
-        console.log(json.graph)
     }
 }
 

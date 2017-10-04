@@ -16,6 +16,7 @@ class App extends React.Component {
         this.props.getUser()
     }
 
+
     render() {
 
         const {user, graph, socket, loading} = this.props;
@@ -28,9 +29,9 @@ class App extends React.Component {
                     <StatusBar socket={socket} loading={loading}/>
                     <Result result={graph}/>
                 </div>
-                <GraphWeb
-                    data={this.props.graph}
-                />
+                {/*<GraphWeb*/}
+                    {/*data={this.props.graph.data}*/}
+                {/*/>*/}
             </div>
         )
     }
@@ -40,7 +41,7 @@ export default connect(
     state => {
         return {
             user: state.user,
-            graph: state.graph,
+            graph: state.graph.data,
             socket: state.socket,
             loading: state.loadingBar !== 0
         }
