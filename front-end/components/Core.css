@@ -21,3 +21,64 @@
 * {
     font-family: 'Source Sans Pro Light', Arial, sans-serif;
 }
+@keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.content-wrapper{
+    margin: 50px auto 0 auto;
+    background: rgba(230, 229, 229, 0.5);
+    padding: 30px;
+    /*transition: all .50s ease;*/
+    animation: fadein 0.5s;
+}
+
+.process-panel{
+    width: 60%;
+}
+.process-panel .loader{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-content: center;
+    color:#797f85;
+}
+
+.process-panel .loader > div{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.process-panel .loader div i{
+    margin-right: 5px;
+}
+
+.process-panel .log {
+    margin-top: 20px;
+    padding: 0 20px;
+    height: 0;
+    transition: all .50s ease;
+    text-align: left;
+    background: #eae7e7;
+    overflow-y: scroll;
+}
+
+.process-panel .log.active {
+    height: 200px;
+}
+
+.process-panel .show-log-button i {
+    transition: all .60s ease;
+}
+.process-panel .show-log-button .active {
+    transform: rotate(180deg);
+}
+
+.process-panel .show-log-button:hover{
+    cursor: pointer;
+}
+/*.animated-wrapper.result {*/
+    /*width: 80%;*/
+/*}*/
