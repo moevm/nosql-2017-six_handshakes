@@ -29,7 +29,7 @@ class App extends React.Component {
                     <Result result={graph}/>
                 </div>
                 <GraphWeb
-                    data={graph}
+                    data={this.props.graph}
                 />
             </div>
         )

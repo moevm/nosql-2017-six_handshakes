@@ -3,12 +3,12 @@ package com.eltech.sh.beans;
 public class Node {
     private int id;
     private String label;
-    private String circularImage;
+    private String image;
 
-    public Node(int id, String label, String circularImage) {
+    public Node(int id, String label, String image) {
         this.id = id;
         this.label = label;
-        this.circularImage = circularImage;
+        this.image = image;
     }
 
     public int getId() {
@@ -27,11 +27,11 @@ public class Node {
         this.label = label;
     }
 
-    public String getCircularImage() {
-        return circularImage;
+    public String getImage() {
+        return image;
     }
 
-    public void setCircularImage(String circularImage) {
-        this.circularImage = circularImage;
+    public void setImage(String image) {
+        this.image = image;
     }
 }

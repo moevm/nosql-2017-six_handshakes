@@ -35,10 +35,12 @@ public class PersonController {
 
     @GetMapping("/find")
     ResponseBean checkSixHandshakes(@RequestParam("from") String fromId, @RequestParam("to") String toId) {
-        List<Person> list = handshakeService.checkSixHandshakes(fromId, toId);
-        TimeBean timeBean = handshakeService.getTimerValues();
-        Integer peopleCount = handshakeService.getPeopleCount();
-        Integer web = handshakeService.getCurrentWeb();
-        return new ResponseBean(list, handshakeService.findAllPaths(fromId, toId), timeBean, peopleCount, web);
+        return new ResponseBean(
+                handshakeService.checkSixHandshakes(fromId, toId),
+                handshakeService.findAllPaths(fromId, toId),
+                handshakeService.getTimerValues(),
+                handshakeService.getPeopleCount(),
+                handshakeService.getCurrentWeb()
+        );
     }
 }
