@@ -6,15 +6,25 @@ import java.util.List;
 
 public class ResponseBean {
     private List<Person> people;
+    private GraphBean graph;
     private TimeBean timeStat;
     private Integer peopleChecked;
     private Integer currentWeb;
 
-    public ResponseBean(List<Person> people, TimeBean timeStat, Integer peopleChecked, Integer currentWeb) {
+    public ResponseBean(List<Person> people, GraphBean graph, TimeBean timeStat, Integer peopleChecked, Integer currentWeb) {
         this.people = people;
+        this.graph = graph;
         this.timeStat = timeStat;
         this.peopleChecked = peopleChecked;
         this.currentWeb = currentWeb;
+    }
+
+    public GraphBean getGraph() {
+        return graph;
+    }
+
+    public void setGraph(GraphBean graph) {
+        this.graph = graph;
     }
 
     public List<Person> getPeople() {

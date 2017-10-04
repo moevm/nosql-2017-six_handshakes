@@ -9,24 +9,31 @@ import "../resources/css/imports.css"
 import "./Core.css"
 import {Header} from "./Header";
 import {ChartPanel} from "./ChartPanel";
+import GraphWeb from "./GraphWeb";
 
 class App extends React.Component {
     componentDidMount() {
         this.props.getUser()
     }
 
+
     render() {
 
         const {user, graph, socket, loading} = this.props;
 
-        return (<div>
-            <Header user={user}/>
-            <div className="main-wrapper">
-                <Form socket={socket}/>
-                <StatusBar socket={socket} loading={loading}/>
-                <Result result={graph}/>
+        return (
+            <div>
+                <Header user={user}/>
+                <div className="main-wrapper">
+                    <Form socket={socket}/>
+                    <StatusBar socket={socket} loading={loading}/>
+                    <Result result={graph}/>
+                </div>
+                {/*<GraphWeb*/}
+                    {/*data={this.props.graph.data}*/}
+                {/*/>*/}
             </div>
-        </div>)
+        )
     }
 }
 
@@ -34,7 +41,7 @@ export default connect(
     state => {
         return {
             user: state.user,
-            graph: state.graph,
+            graph: state.graph.data,
             socket: state.socket,
             loading: state.loadingBar !== 0
         }

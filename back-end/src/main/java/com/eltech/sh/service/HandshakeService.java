@@ -1,7 +1,11 @@
 package com.eltech.sh.service;
 
+import com.eltech.sh.beans.Edge;
+import com.eltech.sh.beans.GraphBean;
+import com.eltech.sh.beans.Node;
 import com.eltech.sh.beans.TimeBean;
 import com.eltech.sh.model.Person;
+import javafx.util.Pair;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.JsonElement;
@@ -11,6 +15,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class HandshakeService {
@@ -71,6 +76,19 @@ public class HandshakeService {
 
     public Integer getCurrentWeb() {
         return dbService.countPeople(1);
+    }
+
+    public GraphBean findAllPaths(String from, String to) {
+        Pair<List<Edge>, List<Integer>> graphData = dbService.findWebByQuery(vkService.getPersonIntegerIdByStringId(from),
+                vkService.getPersonIntegerIdByStringId(to));
+
+        List<Person> people = vkService.getPersonsByIds(graphData.getValue());
+
+        List<Node> nodes = people.stream().map(vk -> new Node(vk.getVkId(),
+                String.valueOf(vk.getFirstName() + " " + vk.getLastName()),
+                vk.getPhotoUrl()))
+                .collect(Collectors.toList());
+        return new GraphBean(nodes, graphData.getKey());
     }
 
     private List<Integer> findPath(int from, int to) {
