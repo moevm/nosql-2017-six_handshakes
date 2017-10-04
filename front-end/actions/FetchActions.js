@@ -1,7 +1,17 @@
-//TODO replace console log by some action
 export function fetchRequest() {
-    console.log('Send request');
     return {
-        type: 'NONE'
+        type: 'FETCH_REQUEST'
+    }
+}
+
+export function fetchSuccess() {
+    return {
+        type: 'FETCH_SUCCESS'
+    }
+}
+
+export function fetchFailure() {
+    return {
+        type: 'FETCH_FAILURE'
     }
 }
