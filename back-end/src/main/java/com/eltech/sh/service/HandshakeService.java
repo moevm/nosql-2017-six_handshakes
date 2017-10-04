@@ -2,6 +2,7 @@ package com.eltech.sh.service;
 
 import com.eltech.sh.beans.TimeBean;
 import com.eltech.sh.model.Person;
+import com.google.gson.JsonElement;
 import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -76,20 +77,35 @@ public class HandshakeService {
 
         for (int i = 0; i < 3; i++) {
             notify("STARTED ITERATION# " + i);
+
+            List<Integer> currFriendIds = new ArrayList<>();
             while (!toVisit.isEmpty()) {
                 notify("PEOPLE TO CHECK " + toVisit.size());
                 Integer cur = toVisit.poll();
-                if (!visited.contains(cur)) {
-
+                currFriendIds.add(cur);
+                visited.add(cur);
+                if(currFriendIds.size() == 24)
+                {
                     startTimer(vkTimer);
-                    List<Integer> friendIds = findAndSavePersonFriends(cur.toString());
+                    List<Integer>  friendIds = vkService.getFriendsByIds(currFriendIds);
                     vkTimer.suspend();
-                    visited.add(cur);
-
+                    currFriendIds.clear();
                     for (Integer id : friendIds) {
                         if (!visited.contains(id)) {
                             nextLevel.add(id);
                         }
+                    }
+                }
+            }
+            if(currFriendIds.size() != 0)
+            {
+                startTimer(vkTimer);
+                List<Integer>  friendIds = vkService.getFriendsByIds(currFriendIds);
+                vkTimer.suspend();
+                currFriendIds.clear();
+                for (Integer id : friendIds) {
+                    if (!visited.contains(id)) {
+                        nextLevel.add(id);
                     }
                 }
             }
@@ -155,9 +171,11 @@ public class HandshakeService {
             notify("RESPONSE: " + 0 + " FRIENDS (USER IS BANNED OR SMTH ELSE)");
             return new ArrayList<>();
         }
+
     }
 
     private void notify(String msg) {
+//        System.out.println(msg);
         simpMessagingTemplate.convertAndSend("/topic/status", msg);
     }
 }
