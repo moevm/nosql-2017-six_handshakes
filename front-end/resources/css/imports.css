@@ -1,0 +1,32 @@
+@import "../fonts/css/font-awesome.min.css";
+
+@font-face {
+    font-family: 'Source Sans Pro Regular';
+    src: url(../fonts/sspro/SourceSansPro-Regular.otf);
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Source Sans Pro Light';
+    src: url(../fonts/sspro/SourceSansPro-Light.otf);
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Source Sans Pro Bold';
+    src: url(../fonts/sspro/SourceSansPro-Bold.otf);
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Source Sans Pro Semibold';
+    src: url(../fonts/sspro/SourceSansPro-Semibold.otf);
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Source Sans Pro Italic';
+    src: url(../fonts/sspro/SourceSansPro-It.otf);
+    font-weight: normal;
+    font-style: normal;
+}
