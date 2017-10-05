@@ -1,6 +1,6 @@
 import React from "react";
 import {reduxForm, Field, change} from 'redux-form';
-import {handleFormSubmit} from "../actions/GraphActions";
+import {handleFormSubmit} from "../actions/SearchActions";
 import "./Form.css"
 import {connect} from "react-redux";
 let Form = props => {

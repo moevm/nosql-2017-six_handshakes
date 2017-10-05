@@ -92,12 +92,8 @@ public class HandshakeService {
 
     private List<Integer> findPath(int from, int to) {
         Queue<Integer> nextLevel = new LinkedList<>();
-        Date startTime = new Date();
-
         for (int i = 0; i < 3; i++) {
             notify("Started iteration # " + i);
-
-
             List<Integer> currFriendIds = new ArrayList<>();
             while (!toVisit.isEmpty()) {
                 notify("People to check: " + toVisit.size());
