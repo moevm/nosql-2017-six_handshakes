@@ -27,14 +27,13 @@ let events = {
 export default class GraphWeb extends React.Component {
 
     render() {
-        console.log(data);
         return (
             <div>
-                <Graph
+                {this.props.data && <Graph
                     options={options}
                     graph={this.props.data}
-                    style={{height: "640px"}}
-                />
+                    style={{height: '400px'}}
+                />}
             </div>
         );
     }

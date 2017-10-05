@@ -8,6 +8,7 @@
     background-color: #8395a6;
     display: flex;
     justify-content: space-between;
+    z-index: 2;
 }
 
 .header .title{
