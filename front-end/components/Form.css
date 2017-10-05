@@ -6,11 +6,6 @@
 
 .main-form {
     width: 30%;
-    margin: 50px auto 0 auto;
-    background: rgba(230, 229, 229, 0.5);
-    padding: 30px;
-
-    animation: fadein 0.5s;
 }
 
 .main-form > h3 {
@@ -72,4 +67,12 @@
 
 .submit-button.disabled:hover{
     cursor: default;
+}
+
+.error-label{
+    color:#797f85;
+}
+
+.error-label i{
+    margin-right: 5px;
 }

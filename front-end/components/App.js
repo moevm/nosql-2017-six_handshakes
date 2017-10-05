@@ -2,6 +2,7 @@ import React from "react";
 import {fetchUser} from "../actions/UserActions";
 import {connect} from 'react-redux';
 import {StatusBar} from "./StatusBar";
+import {ProcessPanel} from "./ProcessPanel";
 import Form from "./Form";
 import {Result} from "./Result";
 import "./style.css"
@@ -12,29 +13,40 @@ import {ChartPanel} from "./ChartPanel";
 import GraphWeb from "./GraphWeb";
 
 class App extends React.Component {
+    constructor() {
+        super();
+        this.renderContent = this.renderContent.bind(this);
+    }
+
     componentDidMount() {
         this.props.getUser()
     }
 
-
     render() {
 
-        const {user, graph, socket, loading} = this.props;
+        const {user, graph} = this.props;
 
         return (
             <div>
                 <Header user={user}/>
+                <div className="background"/>
                 <div className="main-wrapper">
-                    <Form socket={socket}/>
-                    <StatusBar socket={socket} loading={loading}/>
-                    <Result result={graph}/>
+                    {this.renderContent()}
                 </div>
-                {/*<GraphWeb*/}
-                    {/*data={this.props.graph.data}*/}
-                {/*/>*/}
             </div>
         )
     }
+
+    renderContent() {
+        const {socket, loading, graph} = this.props;
+
+        if (socket.socketState === 'CONNECTED' && loading || socket.searchState.length !== 0) {
+            return (<ProcessPanel socket={socket} loading={loading} graph={graph}/>)
+        } else {
+            return (<Form socket={socket}/>)
+        }
+    }
+
 }
 
 export default connect(
