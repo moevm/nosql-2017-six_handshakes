@@ -15,11 +15,12 @@
     "file-loader": "^0.11.2",
     "font-awesome": "^4.7.0",
     "node-sass": "^4.5.3",
-    "react": "^15.6.1",
-    "react-dom": "^15.6.1",
+    "react": "^15.6.2",
+    "react-dom": "^15.6.2",
+    "react-graph-vis": "^1.0.1",
     "react-redux": "^5.0.6",
-    "react-redux-loading-bar": "^2.9.2",
-    "react-transition-group": "^1.2.0",
+    "react-redux-loading-bar": "^2.9.3",
+    "react-transition-group": "^1.2.1",
     "recharts": "^1.0.0-apha.5",
     "redux": "^3.7.2",
     "redux-form": "^7.0.4",
@@ -29,8 +30,7 @@
     "stompjs": "^2.3.3",
     "style-loader": "^0.18.2",
     "webpack": "^3.6.0",
-    "webpack-dev-server": "^2.8.2",
-    "react-graph-vis": "^1.0.1"
+    "webpack-dev-server": "^2.9.1"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",

@@ -13,10 +13,11 @@ import {ChartPanel} from "./ChartPanel";
 import GraphWeb from "./GraphWeb";
 
 class App extends React.Component {
-    constructor(){
+    constructor() {
         super();
         this.renderContent = this.renderContent.bind(this);
     }
+
     componentDidMount() {
         this.props.getUser()
     }
@@ -25,24 +26,22 @@ class App extends React.Component {
 
         const {user, graph} = this.props;
 
-        return (<div>
-            <Header user={user}/>
-            <div className="main-wrapper">
-                {this.renderContent()}
-                <Result result={graph}/>
-            </div>
-            {/*<GraphWeb*/}
-            {/*data={this.props.graph.data}*/}
-            {/*/>*/}
+        return (
+            <div>
+                <Header user={user}/>
+                <div className="background"/>
+                <div className="main-wrapper">
+                    {this.renderContent()}
+                </div>
             </div>
         )
     }
 
     renderContent() {
-        const {socket, loading} = this.props;
+        const {socket, loading, graph} = this.props;
 
         if (socket.socketState === 'CONNECTED' && loading || socket.searchState.length !== 0) {
-            return (<ProcessPanel socket={socket} loading={loading}/>)
+            return (<ProcessPanel socket={socket} loading={loading} graph={graph}/>)
         } else {
             return (<Form socket={socket}/>)
         }
