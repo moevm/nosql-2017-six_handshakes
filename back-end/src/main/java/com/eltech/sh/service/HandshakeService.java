@@ -5,10 +5,9 @@ import com.eltech.sh.beans.GraphBean;
 import com.eltech.sh.beans.Node;
 import com.eltech.sh.beans.TimeBean;
 import com.eltech.sh.model.Person;
-import javafx.util.Pair;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.gson.JsonElement;
+import javafx.util.Pair;
 import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -96,19 +95,18 @@ public class HandshakeService {
         Date startTime = new Date();
 
         for (int i = 0; i < 3; i++) {
-            notify("STARTED ITERATION# " + i);
+            notify("Started iteration # " + i);
 
 
             List<Integer> currFriendIds = new ArrayList<>();
             while (!toVisit.isEmpty()) {
-                notify("PEOPLE TO CHECK " + toVisit.size());
+                notify("People to check: " + toVisit.size());
                 Integer cur = toVisit.poll();
                 currFriendIds.add(cur);
                 visited.add(cur);
-                if(currFriendIds.size() == 24)
-                {
+                if (currFriendIds.size() == 24) {
                     startTimer(vkTimer);
-                    List<Integer>  friendIds = findAndSavePersonFriends(currFriendIds);
+                    List<Integer> friendIds = findAndSavePersonFriends(currFriendIds);
                     vkTimer.suspend();
                     for (Integer id : friendIds) {
                         if (!visited.contains(id)) {
@@ -118,10 +116,9 @@ public class HandshakeService {
                     currFriendIds.clear();
                 }
             }
-            if(currFriendIds.size() != 0)
-            {
+            if (currFriendIds.size() != 0) {
                 startTimer(vkTimer);
-                List<Integer>  friendIds = findAndSavePersonFriends(currFriendIds);
+                List<Integer> friendIds = findAndSavePersonFriends(currFriendIds);
                 vkTimer.suspend();
                 for (Integer id : friendIds) {
                     if (!visited.contains(id)) {
@@ -135,32 +132,31 @@ public class HandshakeService {
             nextLevel.clear();
 
             startTimer(csvTimer);
-            notify("SAVING FRIENDS TO NEO4J");
+            notify("Saving friends");
             csvService.save(data);
             csvTimer.suspend();
 
             startTimer(dbTimer);
-            notify("MIGRATION TO DB");
+            notify("Migrate friends to database");
             dbService.migrateToDB();
-            notify("MIGRATION TO DB IS OVER");
             dbTimer.suspend();
             startTimer(csvTimer);
             data.clear();
             csvTimer.suspend();
 
-            notify("FINDING PATH");
+            notify("Finding path");
             startTimer(pathTimer);
             List<Integer> nodeIds = dbService.findPathByQuery(from, to);
             pathTimer.suspend();
 
             if (!nodeIds.isEmpty()) {
-                notify("PATH IS FOUND: " + new Date(new Date().getTime() - startTime.getTime()));
+                notify("Path is found");
                 startTimer(csvTimer);
                 csvService.deleteCSV();
                 csvTimer.suspend();
                 return nodeIds;
             } else {
-                notify("THERE IS NO PATH YET");
+                notify("There is no path yet");
                 startTimer(csvTimer);
                 csvService.deleteCSV();
                 csvTimer.suspend();
@@ -178,21 +174,21 @@ public class HandshakeService {
     }
 
     private List<Integer> findAndSavePersonFriends(List<Integer> userIds) {
-        peopleCount+=userIds.size();
-        notify("REQUESTING FRIENDS OF USERS #" + userIds);
+        peopleCount += userIds.size();
+        notify("Requesting friends");
         JsonNode friendIds = vkService.getFriendsByIds(userIds);
         List<Integer> save = new ArrayList<>();
-        int i=0;
-        for (JsonNode curr: friendIds) {
-            if(curr.size() > 0) {
+        int i = 0;
+        for (JsonNode curr : friendIds) {
+            if (curr.size() > 0) {
                 List<Integer> saveNode = vkService.objectMapper.convertValue(curr.findValue("items"), new TypeReference<List<Integer>>() {
                 });
                 data.put(userIds.get(i), saveNode);
-                notify("RESPONSE: " + saveNode.size() + " FRIENDS");
+                notify("Response: " + saveNode.size() + " friends");
                 i++;
                 save.addAll(saveNode);
             } else {
-                notify("RESPONSE: " + 0 + " FRIENDS (USER IS BANNED OR SMTH ELSE)");
+                notify("Response: 0 friends (user is probably banned)");
                 return new ArrayList<>();
             }
         }
@@ -200,7 +196,6 @@ public class HandshakeService {
     }
 
     private void notify(String msg) {
-//        System.out.println(msg);
         simpMessagingTemplate.convertAndSend("/topic/status", msg);
     }
 }
