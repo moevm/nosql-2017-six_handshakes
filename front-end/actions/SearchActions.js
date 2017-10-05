@@ -3,9 +3,9 @@ import {SERVER_URL} from "./index";
 import {clearSearchState} from "./SocketActions";
 import {fetchFailure, fetchRequest, fetchSuccess} from "./FetchActions";
 
-export const setGraph = payload => {
+export const setResult = payload => {
     return {
-        type: 'SET_GRAPH',
+        type: 'SET_RESULT',
         payload
     }
 };
@@ -13,7 +13,7 @@ export const setGraph = payload => {
 function fetchSearchSuccess(json) {
     return dispatch => {
         dispatch(fetchSuccess());
-        dispatch(setGraph(json.graph));
+        dispatch(setResult(json));
     }
 }
 

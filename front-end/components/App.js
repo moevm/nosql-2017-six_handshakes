@@ -1,16 +1,12 @@
 import React from "react";
 import {fetchUser} from "../actions/UserActions";
 import {connect} from 'react-redux';
-import {StatusBar} from "./StatusBar";
 import {ProcessPanel} from "./ProcessPanel";
 import Form from "./Form";
-import {Result} from "./Result";
 import "./style.css"
 import "../resources/css/imports.css"
 import "./Core.css"
 import {Header} from "./Header";
-import {ChartPanel} from "./ChartPanel";
-import GraphWeb from "./GraphWeb";
 
 class App extends React.Component {
     constructor() {
@@ -24,7 +20,7 @@ class App extends React.Component {
 
     render() {
 
-        const {user, graph} = this.props;
+        const {user} = this.props;
 
         return (
             <div>
@@ -38,10 +34,10 @@ class App extends React.Component {
     }
 
     renderContent() {
-        const {socket, loading, graph} = this.props;
+        const {socket, loading, result} = this.props;
 
         if (socket.socketState === 'CONNECTED' && loading || socket.searchState.length !== 0) {
-            return (<ProcessPanel socket={socket} loading={loading} graph={graph}/>)
+            return (<ProcessPanel socket={socket} loading={loading} result={result}/>)
         } else {
             return (<Form socket={socket}/>)
         }
@@ -53,7 +49,7 @@ export default connect(
     state => {
         return {
             user: state.user,
-            graph: state.graph.data,
+            result: state.result,
             socket: state.socket,
             loading: state.loadingBar !== 0
         }

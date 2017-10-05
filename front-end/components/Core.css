@@ -21,12 +21,17 @@
 * {
     font-family: 'Source Sans Pro Light', Arial, sans-serif;
 }
+
 @keyframes fadein {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
-.content-wrapper{
+.content-wrapper {
     margin: 50px auto 0 auto;
     background: rgba(230, 229, 229, 0.5);
     padding: 30px;
@@ -34,24 +39,25 @@
     animation: fadein 0.5s;
 }
 
-.process-panel{
+.process-panel {
     width: 60%;
 }
-.process-panel .loader{
+
+.process-panel .loader {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-content: center;
-    color:#797f85;
+    color: #797f85;
 }
 
-.process-panel .loader > div{
+.process-panel .loader > div {
     display: flex;
     flex-direction: row;
     align-items: center;
 }
 
-.process-panel .loader div i{
+.process-panel .loader div i {
     margin-right: 5px;
 }
 
@@ -73,23 +79,56 @@
 .process-panel .show-log-button i {
     transition: all .60s ease;
 }
+
 .process-panel .show-log-button .active {
     transform: rotate(180deg);
 }
 
-.process-panel .show-log-button:hover{
+.process-panel .show-log-button:hover {
     cursor: pointer;
 }
 
-.process-panel .graph{
+.process-panel .graph {
     height: 0;
     transition: all .50s ease;
 }
 
-.process-panel .graph.active{
+.process-panel .graph.active {
     height: 400px;
     margin-bottom: 30px;
 }
-/*.animated-wrapper.result {*/
-    /*width: 80%;*/
-/*}*/
+
+.process-panel .tabs {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.process-panel .tabs div {
+    color: #797f85;
+    transition: all .10s ease;
+    padding: 5px 30px;
+    background: #e1e1e1;
+    margin-right: 2px;
+}
+
+.process-panel .tabs div:hover {
+    cursor: pointer;
+    color: #567592;
+}
+
+.process-panel .tabs div.active {
+    color: #567592;
+}
+
+.stat-panel {
+    /*display: flex;*/
+    /*flex-direction: row;*/
+    /*align-items: center;*/
+    color: #797f85;
+    text-align: left;
+}
+
+.stat-panel .numbers {
+
+}
