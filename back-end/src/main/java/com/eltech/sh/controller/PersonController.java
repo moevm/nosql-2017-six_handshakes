@@ -34,13 +34,18 @@ public class PersonController {
     }
 
     @GetMapping("/find")
-    ResponseBean checkSixHandshakes(@RequestParam("from") String fromId, @RequestParam("to") String toId) {
-        return new ResponseBean(
-                handshakeService.checkSixHandshakes(fromId, toId),
-                handshakeService.findAllPaths(fromId, toId),
+    ResponseBean checkSixHandshakes(@RequestParam("from") String fromId, @RequestParam("to") String toId, HttpServletRequest request) {
+        String strId = (String) request.getSession().getAttribute("current_user_id");
+        Integer id = vkService.getPersonIntegerIdByStringId(strId);
+
+        ResponseBean info = new ResponseBean(
+                handshakeService.checkSixHandshakes(fromId, toId, id),
+                handshakeService.findAllPaths(fromId, toId, id),
                 handshakeService.getTimerValues(),
                 handshakeService.getPeopleCount(),
-                handshakeService.getCurrentWeb()
+                handshakeService.getCurrentWeb(id)
         );
+        handshakeService.clearCluster(id);
+        return info;
     }
 }

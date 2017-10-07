@@ -33,8 +33,7 @@ public class HandshakeService {
     private Integer peopleCount;
 
     @Autowired
-    public HandshakeService(VKService vkService, SimpMessagingTemplate simpMessagingTemplate, CSVService csvService, DBService dbService /*,
-                           /* StopWatch vkTimer, StopWatch dbTimer, StopWatch pathTimer */) {
+    public HandshakeService(VKService vkService, SimpMessagingTemplate simpMessagingTemplate, CSVService csvService, DBService dbService) {
         this.vkService = vkService;
         this.simpMessagingTemplate = simpMessagingTemplate;
         this.csvService = csvService;
@@ -43,7 +42,7 @@ public class HandshakeService {
 
     private void init() {
         toVisit = new LinkedList<>();
-        visited = new HashSet<>(10000);
+        visited = new HashSet<>(1000);
         data = new HashMap<>();
         this.vkTimer = new StopWatch();
         this.dbTimer = new StopWatch();
@@ -52,7 +51,7 @@ public class HandshakeService {
         peopleCount = 0;
     }
 
-    public List<Person> checkSixHandshakes(String from, String to) {
+    public List<Person> checkSixHandshakes(String from, String to, Integer owner) {
         init();
 
         Integer origIdFrom = vkService.getPersonIntegerIdByStringId(from);
@@ -61,7 +60,7 @@ public class HandshakeService {
         toVisit.add(origIdFrom);
         toVisit.add(origIdTo);
 
-        List<Integer> nodeIds = findPath(origIdFrom, origIdTo);
+        List<Integer> nodeIds = findPath(origIdFrom, origIdTo, owner);
         return vkService.getPersonsByIds(nodeIds);
     }
 
@@ -73,15 +72,19 @@ public class HandshakeService {
         return peopleCount;
     }
 
-    public Integer getCurrentWeb() {
-        return dbService.countPeople(1);
+    public Integer getCurrentWeb(Integer owner) {
+        return dbService.countPeople(owner);
     }
 
-    public GraphBean findAllPaths(String from, String to) {
+    public void clearCluster(Integer user) {
+        dbService.deleteCluster(user);
+    }
+
+    public GraphBean findAllPaths(String from, String to, Integer owner) {
         Integer fromId = vkService.getPersonIntegerIdByStringId(from),
                 toId = vkService.getPersonIntegerIdByStringId(to);
 
-        Pair<List<Edge>, List<Integer>> graphData = dbService.findWebByQuery(fromId, toId);
+        Pair<List<Edge>, List<Integer>> graphData = dbService.findWebByQuery(fromId, toId, owner);
 
         List<Person> people = vkService.getPersonsByIds(graphData.getValue());
 
@@ -97,7 +100,7 @@ public class HandshakeService {
     }
 
 
-    private List<Integer> findPath(int from, int to) {
+    private List<Integer> findPath(Integer from, Integer to, Integer owner) {
         Queue<Integer> nextLevel = new LinkedList<>();
         for (int i = 0; i < 3; i++) {
             notify("Started iteration # " + i);
@@ -141,7 +144,7 @@ public class HandshakeService {
 
             startTimer(dbTimer);
             notify("Migrate friends to database");
-            dbService.migrateToDB();
+            dbService.migrateToDB(owner);
             dbTimer.suspend();
             startTimer(csvTimer);
             data.clear();
@@ -149,7 +152,7 @@ public class HandshakeService {
 
             notify("Finding path");
             startTimer(pathTimer);
-            List<Integer> nodeIds = dbService.findPathByQuery(from, to);
+            List<Integer> nodeIds = dbService.findPathByQuery(from, to, owner);
             pathTimer.suspend();
 
             if (!nodeIds.isEmpty()) {
@@ -165,7 +168,7 @@ public class HandshakeService {
                 csvTimer.suspend();
             }
         }
-        return dbService.findPathByQuery(from, to);
+        return dbService.findPathByQuery(from, to, owner);
     }
 
     private void startTimer(StopWatch timer) {

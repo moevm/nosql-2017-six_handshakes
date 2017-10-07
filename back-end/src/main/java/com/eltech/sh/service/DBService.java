@@ -26,19 +26,27 @@ public class DBService {
         this.session = session;
     }
 
-    public void migrateToDB() {
-        session.run("CREATE CONSTRAINT ON (person:Person) ASSERT person.vkId IS UNIQUE");
+    public void migrateToDB(Integer curUser) {
+        session.run("CREATE CONSTRAINT ON (person:{curUser}) ASSERT person.vkId IS UNIQUE",
+                parameters("curUser", curUser));
+
+        //  session.run("CREATE CONSTRAINT ON (person:Person) ASSERT (person.vkId, person.owner) IS NODE KEY");
 
         session.run("LOAD CSV FROM 'http://localhost:8080/csv' AS line\n" +
-                "MERGE (from:Person { vkId: toInt(line[0])})\n" +
-                "MERGE (to:Person { vkId: toInt(line[1])})\n" +
-                "MERGE ((from)-[:FRIEND]-(to))");
+                        "MERGE (from:{curUser} { vkId: toInt(line[0])})\n" +
+                        "MERGE (to:{curUser} { vkId: toInt(line[1])})\n" +
+                        "MERGE ((from)-[:FRIEND]-(to))",
+                parameters("curUser", curUser));
     }
 
-    public List<Integer> findPathByQuery(Integer from, Integer to) {
+    public List<Integer> findPathByQuery(Integer from, Integer to, Integer curUser) {
         StatementResult result = session.run(
-                "MATCH (from:Person {vkId:{from}}),(to:Person {vkId:{to}}), path = shortestPath((from)-[:FRIEND*..5]-(to)) RETURN path",
-                parameters("from", from, "to", to));
+                "MATCH (" +
+                        "from:{curUser} {vkId:{from}})," +
+                        "(to:{curUser} {vkId:{to}}), " +
+                        "path = shortestPath((from)-[:FRIEND*..5]-(to)) " +
+                        "RETURN path",
+                parameters("from", from, "to", to, "curUser", curUser));
 
         List<Integer> resultIds = new ArrayList<>();
 
@@ -48,10 +56,14 @@ public class DBService {
         return resultIds;
     }
 
-    public Pair<List<Edge>, List<Integer>> findWebByQuery(Integer from, Integer to) {
+    public Pair<List<Edge>, List<Integer>> findWebByQuery(Integer from, Integer to, Integer curUser) {
         StatementResult result = session.run(
-                "MATCH (from:Person {vkId:{from}}),(to:Person {vkId:{to}}), path = allShortestPaths((from)-[:FRIEND*..5]-(to)) RETURN path",
-                parameters("from", from, "to", to));
+                "MATCH (" +
+                        "from:{curUser} {vkId:{from}})," +
+                        "(to:{curUser} {vkId:{to}}), " +
+                        "path = allShortestPaths((from)-[:FRIEND*..5]-(to)) " +
+                        "RETURN path",
+                parameters("from", from, "to", to, "curUser", curUser));
 
         List<Edge> relations = new ArrayList<>();
         Map<Long, Integer> nodes = new HashMap<>();
@@ -70,10 +82,18 @@ public class DBService {
         return new Pair(relations, ids);
     }
 
-    public Integer countPeople(Integer owner) {
+    public Integer countPeople(Integer user) {
         StatementResult result = session.run(
-                "MATCH (person) RETURN count (person)");
+                "MATCH (person: {curUser} }) RETURN count (person)",
+                parameters("curUser", user));
 
         return result.single().get(0).asInt();
+    }
+
+    public void deleteCluster(Integer user) {
+        session.run("MATCH (" +
+                        "person:{curUser})\n" +
+                        "DETACH DELETE person",
+                parameters("curUser", user));
     }
 }
