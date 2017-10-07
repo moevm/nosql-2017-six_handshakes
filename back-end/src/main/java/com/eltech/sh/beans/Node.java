@@ -5,11 +5,38 @@ public class Node {
     private String label;
     private String image;
 
-    public Node(int id, String label, String image) {
+    private Integer x;
+    private Integer y;
+
+    public Integer getX() {
+        return x;
+    }
+
+    public void setX(Integer x) {
+        this.x = x;
+    }
+
+    public Integer getY() {
+        return y;
+    }
+
+    public void setY(Integer y) {
+        this.y = y;
+    }
+
+    public Node(int id, String label, String image, Integer x, Integer y) {
         this.id = id;
         this.label = label;
         this.image = image;
+        this.x = x;
+        this.y = y;
     }
+
+    //    public Node(int id, String label, String image) {
+//        this.id = id;
+//        this.label = label;
+//        this.image = image;
+//    }
 
     public int getId() {
         return id;
