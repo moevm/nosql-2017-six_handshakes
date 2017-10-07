@@ -1,10 +1,37 @@
 import React from "react";
 import GraphWeb from "./GraphWeb";
 import {ChartPanel} from "./ChartPanel";
+import {DetailsPanel} from "./DetailsPanel";
 export class ProcessPanel extends React.Component {
     constructor() {
         super();
         this.state = {showLog: false, activeTab: 'GRAPH'}
+    }
+
+    renderContent() {
+        const {activeTab} = this.state;
+        const {result, result: {graph}} = this.props;
+
+        switch (activeTab) {
+            case 'GRAPH':
+                return (
+                    <div className={`graph ${graph ? 'active' : ''}`}>
+                        <GraphWeb data={graph}/>
+                    </div>
+                );
+            case 'STAT':
+                return (
+                    <div className={`graph ${graph ? 'active' : ''}`}>
+                        <ChartPanel data={result}/>
+                    </div>
+                );
+            case 'DETAILS':
+                return (
+                    <div className={`graph ${graph ? 'active' : ''}`}>
+                        <DetailsPanel data={result}/>
+                    </div>
+                );
+        }
     }
 
     render() {
@@ -24,16 +51,12 @@ export class ProcessPanel extends React.Component {
                     <div className={`${activeTab === 'STAT' ? 'active' : ''}`}
                          onClick={() => this.setState({activeTab: 'STAT'})}><i
                         className={`fa fa-pie-chart fa-2x`}/></div>
+                    <div className={`${activeTab === 'DETAILS' ? 'active' : ''}`}
+                         onClick={() => this.setState({activeTab: 'DETAILS'})}><i
+                        className={`fa fa-ellipsis-h fa-2x`}/></div>
                 </div>
                 }
-                {activeTab === 'GRAPH'
-                    ? <div className={`graph ${graph ? 'active' : ''}`}>
-                        <GraphWeb data={graph}/>
-                    </div>
-                    : <div className={`graph ${graph ? 'active' : ''}`}>
-                        <ChartPanel data={result}/>
-                    </div>
-                }
+                {this.renderContent()}
                 <div className="loader">
                     <div>
                         <i className={stateIconClassName}/>{searchState[searchState.length - 1]}
