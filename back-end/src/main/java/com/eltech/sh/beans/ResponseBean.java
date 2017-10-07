@@ -11,6 +11,7 @@ public class ResponseBean {
     private Integer peopleChecked;
     private Integer currentWeb;
 
+
     public ResponseBean(List<Person> people, GraphBean graph, TimeBean timeStat, Integer peopleChecked, Integer currentWeb) {
         this.people = people;
         this.graph = graph;
@@ -18,6 +19,7 @@ public class ResponseBean {
         this.peopleChecked = peopleChecked;
         this.currentWeb = currentWeb;
     }
+
 
     public GraphBean getGraph() {
         return graph;

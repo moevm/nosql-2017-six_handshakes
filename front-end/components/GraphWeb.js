@@ -3,7 +3,9 @@ import React from "react";
 
 let options = {
     layout: {
-        hierarchical: false
+        hierarchical: {
+            enabled: false
+        }
     },
     edges: {
         color: "#000000",
@@ -20,7 +22,7 @@ let options = {
         nodes: {
             shape: 'circularImage',
             brokenImage: 'http://memepedia.ru/wp-content/uploads/2016/03/ffc073891b259c.jpg',
-            image: ''
+            image: '',
         }
 
 
@@ -31,8 +33,6 @@ let events = {
         let {nodes, edges} = event;
         console.log("Selected nodes:");
         console.log(nodes);
-        console.log("Selected edges:");
-        console.log(edges);
     }
 };
 
@@ -44,6 +44,7 @@ export default class GraphWeb extends React.Component {
             <div>
                 {this.props.data && <Graph
                     options={options}
+                    events={events}
                     graph={this.props.data}
                     style={{height: '400px'}}
                 />}

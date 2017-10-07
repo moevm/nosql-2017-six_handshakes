@@ -78,17 +78,24 @@ public class HandshakeService {
     }
 
     public GraphBean findAllPaths(String from, String to) {
-        Pair<List<Edge>, List<Integer>> graphData = dbService.findWebByQuery(vkService.getPersonIntegerIdByStringId(from),
-                vkService.getPersonIntegerIdByStringId(to));
+        Integer fromId = vkService.getPersonIntegerIdByStringId(from),
+                toId = vkService.getPersonIntegerIdByStringId(to);
+
+        Pair<List<Edge>, List<Integer>> graphData = dbService.findWebByQuery(fromId, toId);
 
         List<Person> people = vkService.getPersonsByIds(graphData.getValue());
 
         List<Node> nodes = people.stream().map(vk -> new Node(vk.getVkId(),
                 String.valueOf(vk.getFirstName() + " " + vk.getLastName()),
-                vk.getPhotoUrl()))
+                vk.getPhotoUrl(),
+                fromId.equals(vk.getVkId()) || toId.equals(vk.getVkId()) ? fromId.equals(vk.getVkId()) ? -300 : 300 : null,
+                fromId.equals(vk.getVkId()) || toId.equals(vk.getVkId()) ? 0 : null
+        ))
                 .collect(Collectors.toList());
+
         return new GraphBean(nodes, graphData.getKey());
     }
+
 
     private List<Integer> findPath(int from, int to) {
         Queue<Integer> nextLevel = new LinkedList<>();
