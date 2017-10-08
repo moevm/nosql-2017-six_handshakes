@@ -1,0 +1,26 @@
+spring:
+  data:
+    neo4j:
+      username: neo4j
+      password: root
+
+  jackson:
+    serialization:
+      indent_output: true
+
+#TODO Fix token problem
+vk:
+  app_id: 6183857
+  client_secret: wtXph7bLCsrEiakszeKj
+
+logging:
+  file: application.log
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  level:
+    org:
+      springframework:
+        web: ERROR
+    com:
+      eltech:
+        sh: DEBUG
