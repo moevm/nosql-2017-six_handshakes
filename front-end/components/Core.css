@@ -35,12 +35,11 @@
     margin: 50px auto 0 auto;
     background: rgba(230, 229, 229, 0.5);
     padding: 30px;
-    /*transition: all .50s ease;*/
     animation: fadein 0.5s;
 }
 
 .process-panel {
-    width: 60%;
+    width: 90%;
 }
 
 .process-panel .loader {
@@ -120,15 +119,32 @@
 .process-panel .tabs div.active {
     color: #567592;
 }
-
 .stat-panel {
-    /*display: flex;*/
-    /*flex-direction: row;*/
-    /*align-items: center;*/
     color: #797f85;
     text-align: left;
 }
+.stat-panel .chart-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
 
-.stat-panel .numbers {
+.details-panel {
+    color: #797f85;
+}
 
+.details-panel .numbers{
+    text-align: left;
+    padding: 0 30%;
+}
+
+.details-panel .numbers div{
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.icon {
+    margin-right: 5px;
 }
