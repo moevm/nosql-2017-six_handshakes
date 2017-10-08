@@ -142,7 +142,7 @@ public class HandshakeService {
 
             startTimer(csvTimer);
             notify("Saving friends");
-            csvService.save(data);
+            csvService.save(data,String.valueOf(curUser));
             csvTimer.suspend();
 
             startTimer(dbTimer);
@@ -161,13 +161,13 @@ public class HandshakeService {
             if (!nodeIds.isEmpty()) {
                 notify("Path is found");
                 startTimer(csvTimer);
-                csvService.deleteCSV();
+                csvService.deleteCSV(String.valueOf(curUser));
                 csvTimer.suspend();
                 return nodeIds;
             } else {
                 notify("There is no path yet");
                 startTimer(csvTimer);
-                csvService.deleteCSV();
+                csvService.deleteCSV(String.valueOf(curUser));
                 csvTimer.suspend();
             }
         }

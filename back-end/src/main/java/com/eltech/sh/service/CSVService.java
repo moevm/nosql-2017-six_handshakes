@@ -66,6 +66,6 @@ public class CSVService {
     }
 
     public String getFilePath(String user) {
-        return String.format("%s%2$simport%2$sdata-%s.csv", System.getProperty("user.dir"), File.separator, user);
+        return String.format("%s%2$simport%2$sdata%3$s.csv", System.getProperty("user.dir"), File.separator, user);
     }
 }
