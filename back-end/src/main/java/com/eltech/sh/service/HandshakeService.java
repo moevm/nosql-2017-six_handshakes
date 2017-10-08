@@ -31,6 +31,7 @@ public class HandshakeService {
     private StopWatch pathTimer;
     private StopWatch csvTimer;
     private Integer peopleCount;
+    private Integer curUser;
 
     @Autowired
     public HandshakeService(VKService vkService, SimpMessagingTemplate simpMessagingTemplate, CSVService csvService, DBService dbService) {
@@ -40,7 +41,7 @@ public class HandshakeService {
         this.dbService = dbService;
     }
 
-    private void init() {
+    private void init(Integer owner) {
         toVisit = new LinkedList<>();
         visited = new HashSet<>(1000);
         data = new HashMap<>();
@@ -49,10 +50,12 @@ public class HandshakeService {
         this.pathTimer = new StopWatch();
         this.csvTimer = new StopWatch();
         peopleCount = 0;
+        curUser = owner;
+
     }
 
     public List<Person> checkSixHandshakes(String from, String to, Integer owner) {
-        init();
+        init(owner);
 
         Integer origIdFrom = vkService.getPersonIntegerIdByStringId(from);
         Integer origIdTo = vkService.getPersonIntegerIdByStringId(to);
@@ -60,7 +63,7 @@ public class HandshakeService {
         toVisit.add(origIdFrom);
         toVisit.add(origIdTo);
 
-        List<Integer> nodeIds = findPath(origIdFrom, origIdTo, owner);
+        List<Integer> nodeIds = findPath(origIdFrom, origIdTo);
         return vkService.getPersonsByIds(nodeIds);
     }
 
@@ -72,26 +75,26 @@ public class HandshakeService {
         return peopleCount;
     }
 
-    public Integer getCurrentWeb(Integer owner) {
-        return dbService.countPeople(owner);
+    public Integer getCurrentWeb() {
+        return dbService.countPeople(curUser);
     }
 
-    public void clearCluster(Integer user) {
-        dbService.deleteCluster(user);
+    public void clearCluster() {
+        dbService.deleteCluster(curUser);
     }
 
-    public GraphBean findAllPaths(String from, String to, Integer owner) {
+    public GraphBean findAllPaths(String from, String to) {
         Integer fromId = vkService.getPersonIntegerIdByStringId(from),
                 toId = vkService.getPersonIntegerIdByStringId(to);
 
-        Pair<List<Edge>, List<Integer>> graphData = dbService.findWebByQuery(fromId, toId, owner);
+        Pair<List<Edge>, List<Integer>> graphData = dbService.findWebByQuery(fromId, toId, curUser);
 
         List<Person> people = vkService.getPersonsByIds(graphData.getValue());
 
         List<Node> nodes = people.stream().map(vk -> new Node(vk.getVkId(),
                 String.valueOf(vk.getFirstName() + " " + vk.getLastName()),
                 vk.getPhotoUrl(),
-                fromId.equals(vk.getVkId()) || toId.equals(vk.getVkId()) ? fromId.equals(vk.getVkId()) ? -300 : 300 : null,
+                fromId.equals(vk.getVkId()) || toId.equals(vk.getVkId()) ? fromId.equals(vk.getVkId()) ? -350 : 350 : null,
                 fromId.equals(vk.getVkId()) || toId.equals(vk.getVkId()) ? 0 : null
         ))
                 .collect(Collectors.toList());
@@ -100,7 +103,7 @@ public class HandshakeService {
     }
 
 
-    private List<Integer> findPath(Integer from, Integer to, Integer owner) {
+    private List<Integer> findPath(Integer from, Integer to) {
         Queue<Integer> nextLevel = new LinkedList<>();
         for (int i = 0; i < 3; i++) {
             notify("Started iteration # " + i);
@@ -144,7 +147,7 @@ public class HandshakeService {
 
             startTimer(dbTimer);
             notify("Migrate friends to database");
-            dbService.migrateToDB(owner);
+            dbService.migrateToDB(curUser);
             dbTimer.suspend();
             startTimer(csvTimer);
             data.clear();
@@ -152,7 +155,7 @@ public class HandshakeService {
 
             notify("Finding path");
             startTimer(pathTimer);
-            List<Integer> nodeIds = dbService.findPathByQuery(from, to, owner);
+            List<Integer> nodeIds = dbService.findPathByQuery(from, to, curUser);
             pathTimer.suspend();
 
             if (!nodeIds.isEmpty()) {
@@ -168,7 +171,7 @@ public class HandshakeService {
                 csvTimer.suspend();
             }
         }
-        return dbService.findPathByQuery(from, to, owner);
+        return dbService.findPathByQuery(from, to, curUser);
     }
 
     private void startTimer(StopWatch timer) {

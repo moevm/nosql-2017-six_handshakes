@@ -40,12 +40,12 @@ public class PersonController {
 
         ResponseBean info = new ResponseBean(
                 handshakeService.checkSixHandshakes(fromId, toId, id),
-                handshakeService.findAllPaths(fromId, toId, id),
+                handshakeService.findAllPaths(fromId, toId),
                 handshakeService.getTimerValues(),
                 handshakeService.getPeopleCount(),
-                handshakeService.getCurrentWeb(id)
+                handshakeService.getCurrentWeb()
         );
-        handshakeService.clearCluster(id);
+        handshakeService.clearCluster();
         return info;
     }
 }

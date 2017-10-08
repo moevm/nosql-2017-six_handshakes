@@ -27,23 +27,27 @@ public class DBService {
     }
 
     public void migrateToDB(Integer curUser) {
-        session.run("CREATE CONSTRAINT ON (person:{curUser}) ASSERT person.vkId IS UNIQUE",
-                parameters("curUser", curUser));
+        session.run("CREATE CONSTRAINT ON (person:Person) ASSERT person.clusterId IS UNIQUE");
 
         //  session.run("CREATE CONSTRAINT ON (person:Person) ASSERT (person.vkId, person.owner) IS NODE KEY");
 
         session.run("LOAD CSV FROM 'http://localhost:8080/csv' AS line\n" +
-                        "MERGE (from:{curUser} { vkId: toInt(line[0])})\n" +
-                        "MERGE (to:{curUser} { vkId: toInt(line[1])})\n" +
+                        "MERGE (from:Person { vkId: toInt(line[0]), " +
+                        "clusterId: toString(line[0]) + toString({curUser}), " +
+                        "owner:{curUser}})\n" +
+                        "MERGE (to:Person { vkId: toInt(line[1]), " +
+                        "clusterId: toString(line[1])+ toString({curUser}), " +
+                        "owner:{curUser}})\n" +
                         "MERGE ((from)-[:FRIEND]-(to))",
                 parameters("curUser", curUser));
     }
 
     public List<Integer> findPathByQuery(Integer from, Integer to, Integer curUser) {
+
         StatementResult result = session.run(
                 "MATCH (" +
-                        "from:{curUser} {vkId:{from}})," +
-                        "(to:{curUser} {vkId:{to}}), " +
+                        "from:Person {clusterId:toString({from}) + toString({curUser})})," +
+                        "(to:Person {clusterId:toString({to}) + toString({curUser})}), " +
                         "path = shortestPath((from)-[:FRIEND*..5]-(to)) " +
                         "RETURN path",
                 parameters("from", from, "to", to, "curUser", curUser));
@@ -59,8 +63,8 @@ public class DBService {
     public Pair<List<Edge>, List<Integer>> findWebByQuery(Integer from, Integer to, Integer curUser) {
         StatementResult result = session.run(
                 "MATCH (" +
-                        "from:{curUser} {vkId:{from}})," +
-                        "(to:{curUser} {vkId:{to}}), " +
+                        "from:Person {clusterId:toString({from}) + toString({curUser})})," +
+                        "(to:Person {clusterId:toString({to}) + toString({curUser})}), " +
                         "path = allShortestPaths((from)-[:FRIEND*..5]-(to)) " +
                         "RETURN path",
                 parameters("from", from, "to", to, "curUser", curUser));
@@ -84,16 +88,14 @@ public class DBService {
 
     public Integer countPeople(Integer user) {
         StatementResult result = session.run(
-                "MATCH (person: {curUser} }) RETURN count (person)",
+                "MATCH (person: Person) where person.owner={curUser} RETURN count (person)",
                 parameters("curUser", user));
 
         return result.single().get(0).asInt();
     }
 
     public void deleteCluster(Integer user) {
-        session.run("MATCH (" +
-                        "person:{curUser})\n" +
-                        "DETACH DELETE person",
+        session.run("MATCH (person:Person) where person.owner={curUser} DETACH DELETE person",
                 parameters("curUser", user));
     }
 }
