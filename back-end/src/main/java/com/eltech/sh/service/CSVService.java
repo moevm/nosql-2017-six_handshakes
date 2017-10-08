@@ -16,14 +16,14 @@ import java.util.Map;
 public class CSVService {
     private static final String NEW_LINE_SEPARATOR = "\n";
 
-    public void save(Map<Integer, List<Integer>> map) {
+    public void save(Map<Integer, List<Integer>> map, String user) {
         createFile();
         FileWriter fileWriter = null;
         CSVPrinter csvFilePrinter = null;
         CSVFormat csvFileFormat = CSVFormat.DEFAULT.withRecordSeparator(NEW_LINE_SEPARATOR);
 
         try {
-            fileWriter = new FileWriter(getFilePath(), true);
+            fileWriter = new FileWriter(getFilePath(user), true);
             csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat);
 
             for (Map.Entry<Integer, List<Integer>> entry : map.entrySet()) {
@@ -49,9 +49,9 @@ public class CSVService {
         }
     }
 
-    public void deleteCSV() {
+    public void deleteCSV(String user) {
         try {
-            Files.deleteIfExists(new File(getFilePath()).toPath());
+            Files.deleteIfExists(new File(getFilePath(user)).toPath());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -65,7 +65,7 @@ public class CSVService {
         }
     }
 
-    public String getFilePath() {
-        return String.format("%s%2$simport%2$sdata.csv", System.getProperty("user.dir"), File.separator);
+    public String getFilePath(String user) {
+        return String.format("%s%2$simport%2$sdata-%s.csv", System.getProperty("user.dir"), File.separator, user);
     }
 }
