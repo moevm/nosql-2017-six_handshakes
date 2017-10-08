@@ -4,9 +4,18 @@ public class Node {
     private int id;
     private String label;
     private String image;
-
     private Integer x;
     private Integer y;
+    private Integer borderWidth;
+
+    public Node(int id, String label, String image, Integer x, Integer y, Integer borderWidth) {
+        this.id = id;
+        this.label = label;
+        this.image = image;
+        this.x = x;
+        this.y = y;
+        this.borderWidth = borderWidth;
+    }
 
     public Integer getX() {
         return x;
@@ -24,19 +33,13 @@ public class Node {
         this.y = y;
     }
 
-    public Node(int id, String label, String image, Integer x, Integer y) {
-        this.id = id;
-        this.label = label;
-        this.image = image;
-        this.x = x;
-        this.y = y;
+    public Integer getBorderWidth() {
+        return borderWidth;
     }
 
-    //    public Node(int id, String label, String image) {
-//        this.id = id;
-//        this.label = label;
-//        this.image = image;
-//    }
+    public void setBorderWidth(Integer borderWidth) {
+        this.borderWidth = borderWidth;
+    }
 
     public int getId() {
         return id;
