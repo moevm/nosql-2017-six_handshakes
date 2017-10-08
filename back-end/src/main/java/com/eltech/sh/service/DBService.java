@@ -29,8 +29,6 @@ public class DBService {
     public void migrateToDB(Integer curUser) {
         session.run("CREATE CONSTRAINT ON (person:Person) ASSERT person.clusterId IS UNIQUE");
 
-        //  session.run("CREATE CONSTRAINT ON (person:Person) ASSERT (person.vkId, person.owner) IS NODE KEY");
-
         session.run("LOAD CSV FROM 'http://localhost:8080/csv' AS line\n" +
                         "MERGE (from:Person { vkId: toInt(line[0]), " +
                         "clusterId: toString(line[0]) + toString({curUser}), " +
