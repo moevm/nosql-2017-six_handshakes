@@ -95,7 +95,8 @@ public class HandshakeService {
                 String.valueOf(vk.getFirstName() + " " + vk.getLastName()),
                 vk.getPhotoUrl(),
                 fromId.equals(vk.getVkId()) || toId.equals(vk.getVkId()) ? fromId.equals(vk.getVkId()) ? -350 : 350 : null,
-                fromId.equals(vk.getVkId()) || toId.equals(vk.getVkId()) ? 0 : null
+                fromId.equals(vk.getVkId()) || toId.equals(vk.getVkId()) ? 0 : null,
+                fromId.equals(vk.getVkId()) || toId.equals(vk.getVkId()) ? 10 : 0
         ))
                 .collect(Collectors.toList());
 
@@ -106,7 +107,7 @@ public class HandshakeService {
     private List<Integer> findPath(Integer from, Integer to) {
         Queue<Integer> nextLevel = new LinkedList<>();
         for (int i = 0; i < 3; i++) {
-            notify("Started iteration # " + i);
+            notify("Started iteration # " + i + 1);
             List<Integer> currFriendIds = new ArrayList<>();
             while (!toVisit.isEmpty()) {
                 notify("People to check: " + toVisit.size());
@@ -142,7 +143,7 @@ public class HandshakeService {
 
             startTimer(csvTimer);
             notify("Saving friends");
-            csvService.save(data,String.valueOf(curUser));
+            csvService.save(data, String.valueOf(curUser));
             csvTimer.suspend();
 
             startTimer(dbTimer);

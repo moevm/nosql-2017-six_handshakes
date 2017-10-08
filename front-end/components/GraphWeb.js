@@ -20,6 +20,9 @@ let options = {
         }
     },
         nodes: {
+            color: {
+                border: '#6cd0ff'
+            },
             shape: 'circularImage',
             brokenImage: 'http://memepedia.ru/wp-content/uploads/2016/03/ffc073891b259c.jpg',
             image: '',
@@ -29,11 +32,11 @@ let options = {
     };
 
 let events = {
-    select: function (event) {
+    doubleClick: function (event){
         let {nodes, edges} = event;
-        console.log("Selected nodes:");
         console.log(nodes);
-    }
+        window.open("https://vk.com/id"+nodes[0],'_blank');
+    },
 };
 
 export default class GraphWeb extends React.Component {
