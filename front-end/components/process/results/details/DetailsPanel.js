@@ -1,6 +1,6 @@
 import React from "react";
-import {Legend, Pie, PieChart} from "recharts";
-import {formatTime} from "../utils/mathUtils";
+import "./DetailsPanel.css"
+
 export class DetailsPanel extends React.Component {
     render() {
         if (this.props.data) {
