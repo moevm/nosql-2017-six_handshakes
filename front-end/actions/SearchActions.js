@@ -2,11 +2,18 @@ import {fetchGet} from "../utils/fetchUtils";
 import {SERVER_URL} from "./index";
 import {clearSearchState} from "./SocketActions";
 import {fetchFailure, fetchRequest, fetchSuccess} from "./FetchActions";
+import {reset} from "redux-form";
 
-export const setResult = payload => {
+const setResult = payload => {
     return {
         type: 'SET_RESULT',
         payload
+    }
+};
+
+const clearResult = () => {
+    return {
+        type: 'CLEAR_RESULT'
     }
 };
 
@@ -28,5 +35,11 @@ export function handleFormSubmit(values, dispatch, props) {
     );
 }
 
-
+export function resetSearchResults() {
+    return dispatch => {
+        dispatch(clearSearchState());
+        dispatch(clearResult());
+        dispatch(reset("mainForm"));
+    }
+}
 

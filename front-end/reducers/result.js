@@ -9,6 +9,8 @@ const result = (state = initialState , action) => {
     switch (action.type) {
         case 'SET_RESULT':
             return  action.payload;
+        case 'CLEAR_RESULT':
+            return initialState;
         default:
             return state;
     }
