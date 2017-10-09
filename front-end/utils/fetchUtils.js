@@ -1,4 +1,4 @@
-export let RequestParamsFactory = {
+const RequestParamsFactory = {
     GET: () => {
         return {
             method: 'GET',
@@ -10,16 +10,11 @@ export let RequestParamsFactory = {
     }
 };
 
-export function fetchGet(url, dispatch, onSuccess, onFailure) {
-    return fetchWrapper(url, RequestParamsFactory.GET(), dispatch, onSuccess, onFailure);
-}
-
 //TODO use isomorphic-fetch or fetch-polyfill
 function fetchWrapper(url, params, dispatch, onSuccess, onFailure) {
     return fetch(url, params)
         .then(
             response => {
-                console.log('RESPONSE', response);
                 if(response.status === 200) {
                     return response.json();
                 }
@@ -33,3 +28,6 @@ function fetchWrapper(url, params, dispatch, onSuccess, onFailure) {
         .catch(error => dispatch(onFailure(`An error occurred. ${error.message}`)));
 }
 
+export function fetchGet(url, dispatch, onSuccess, onFailure) {
+    return fetchWrapper(url, RequestParamsFactory.GET(), dispatch, onSuccess, onFailure);
+}
