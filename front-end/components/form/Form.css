@@ -26,10 +26,14 @@
     margin-bottom: 20px;
 }
 
-.main-form .row input, .icon-button {
+.main-form .row input {
     font-size: 16px;
     padding: 10px;
     border-width: 1px;
+    width: 40%;
+}
+
+.main-form .row .icon-button {
     width: 40%;
 }
 

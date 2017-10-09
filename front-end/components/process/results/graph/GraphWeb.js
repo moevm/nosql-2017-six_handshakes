@@ -1,7 +1,7 @@
 import Graph from "react-graph-vis";
 import React from "react";
 
-let options = {
+const options = {
     layout: {
         hierarchical: {
             enabled: false
@@ -14,41 +14,38 @@ let options = {
             to: {enabled: false},
             from: {enabled: false}
         },
-        scaling:{
-            min:5,
+        scaling: {
+            min: 5,
             max: 25
         }
     },
-        nodes: {
-            color: {
-                border: '#6cd0ff'
-            },
-            shape: 'circularImage',
-            brokenImage: 'http://memepedia.ru/wp-content/uploads/2016/03/ffc073891b259c.jpg',
-            image: '',
-        }
+    nodes: {
+        color: {
+            border: '#6cd0ff'
+        },
+        shape: 'circularImage',
+        brokenImage: 'http://memepedia.ru/wp-content/uploads/2016/03/ffc073891b259c.jpg',
+        image: '',
+    }
+};
 
-
-    };
-
-let events = {
-    doubleClick: function (event){
+const events = {
+    doubleClick: function (event) {
         let {nodes, edges} = event;
         console.log(nodes);
-        window.open("https://vk.com/id"+nodes[0],'_blank');
+        window.open(`https://vk.com/id${nodes[0]}`, '_blank');
     },
 };
 
 export default class GraphWeb extends React.Component {
-
     render() {
-        console.log(this.props.data);
+        const {graph} = this.props.data;
         return (
             <div>
-                {this.props.data && <Graph
+                {graph && <Graph
                     options={options}
                     events={events}
-                    graph={this.props.data}
+                    graph={graph}
                     style={{height: '400px'}}
                 />}
             </div>

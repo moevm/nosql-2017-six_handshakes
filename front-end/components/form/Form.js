@@ -1,10 +1,10 @@
 import React from "react";
 import {reduxForm, Field, change} from 'redux-form';
-import {handleFormSubmit} from "../actions/SearchActions";
+import {handleFormSubmit} from "../../actions/SearchActions";
 import "./Form.css"
 import {connect} from "react-redux";
 let Form = props => {
-    const {handleSubmit, socket: {socketState, searchState}, setDataSource, formValues: {dataSource, from, to}} = props;
+    const {handleSubmit, socket: {socketState}, setDataSource, formValues: {dataSource, from, to}} = props;
 
     let errorMessage = '';
     if (!(from && to)) errorMessage = 'IDs shouldn\'t be empty';
@@ -41,7 +41,6 @@ let Form = props => {
         </div>
     )
 };
-
 
 Form = connect(
     state => ({

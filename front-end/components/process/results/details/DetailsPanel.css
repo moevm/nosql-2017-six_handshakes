@@ -1,0 +1,14 @@
+.details-panel {
+    color: #797f85;
+}
+
+.details-panel .numbers{
+    text-align: left;
+    padding: 0 30%;
+}
+
+.details-panel .numbers div{
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
