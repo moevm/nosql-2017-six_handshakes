@@ -25,6 +25,8 @@ stompClient.connect({}, frame => {
     store.dispatch(setSocketState('CONNECTED'));
 });
 
+store.subscribe(() => console.log('STORE', store.getState()));
+
 render(
     <Provider store={store}>
         <App/>

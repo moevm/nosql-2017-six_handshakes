@@ -80,3 +80,14 @@
 .error-label i{
     margin-right: 5px;
 }
+
+.file-input {
+    padding: 10px 0;
+    height: 0;
+    transition: all .50s ease;
+    text-align: left;
+}
+
+.file-input.active {
+    height: 20px;
+}
