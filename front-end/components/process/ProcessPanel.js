@@ -45,10 +45,17 @@ class ProcessPanel extends React.Component {
                         {this.renderTab('STAT', activeTab === 'STAT', 'fa-pie-chart')}
                         {this.renderTab('DETAILS', activeTab === 'DETAILS', 'fa-ellipsis-h')}
                     </div>
-                    <div className={`icon-button`}
-                         onClick={reset}>
-                        <i className="fa fa-repeat"/>
-                        Try again
+                    <div className="buttons">
+                        <div className={`icon-button`}
+                             onClick={() => console.log('download csv')}>
+                            <i className="fa fa-download"/>
+                            Try again
+                        </div>
+                        <div className={`icon-button`}
+                             onClick={reset}>
+                            <i className="fa fa-repeat"/>
+                            Export CSV
+                        </div>
                     </div>
                 </div>
             );

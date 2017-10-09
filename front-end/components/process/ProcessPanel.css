@@ -85,3 +85,12 @@
     flex-direction: row;
     justify-content: space-between;
 }
+
+.nav .buttons {
+    display: flex;
+    flex-direction: row;
+}
+
+.nav .buttons div {
+    margin-left: 5px;
+}
