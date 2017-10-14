@@ -1,51 +1,35 @@
 package com.eltech.sh.controller;
 
 import com.eltech.sh.beans.ResponseBean;
-import com.eltech.sh.beans.TimeBean;
 import com.eltech.sh.model.Person;
-import com.eltech.sh.service.HandshakeService;
-import com.eltech.sh.service.VKService;
+import com.eltech.sh.service.CoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 
 @RestController
 public class PersonController {
 
-    private final VKService vkService;
-    private final HandshakeService handshakeService;
+    private final CoreService coreService;
 
     @Autowired
-    public PersonController(VKService vkService,
-                            HandshakeService handshakeService) {
-        this.vkService = vkService;
-        this.handshakeService = handshakeService;
+    public PersonController(CoreService coreService) {
+        this.coreService = coreService;
     }
 
     @GetMapping("/me")
     public Person me(HttpServletRequest request) {
         String id = (String) request.getSession().getAttribute("current_user_id");
-        return vkService.getPersonByStringId(id);
+        return coreService.getPersonByStringId(id);
     }
 
     @GetMapping("/find")
-    ResponseBean checkSixHandshakes(@RequestParam("from") String fromId, @RequestParam("to") String toId, HttpServletRequest request) {
-        String strId = (String) request.getSession().getAttribute("current_user_id");
-        Integer id = vkService.getPersonIntegerIdByStringId(strId);
-
-        ResponseBean info = new ResponseBean(
-                handshakeService.checkSixHandshakes(fromId, toId, id),
-                handshakeService.findAllPaths(fromId, toId),
-                handshakeService.getTimerValues(),
-                handshakeService.getPeopleCount(),
-                handshakeService.getCurrentWeb()
-        );
-        handshakeService.clearCluster();
-        return info;
+    public ResponseBean checkSixHandshakes(@RequestParam("from") String fromId, @RequestParam("to") String toId, HttpServletRequest request) {
+        String currentUserId = (String) request.getSession().getAttribute("current_user_id");
+        return coreService.run(fromId, toId,currentUserId);
     }
 }
