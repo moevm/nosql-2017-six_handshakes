@@ -32,6 +32,5 @@ dependencies {
             'org.neo4j:neo4j-kernel:3.3.0-beta02',
             'org.neo4j:neo4j-kernel-api:3.3.0-beta02',
             'org.apache.commons:commons-csv:1.5'
-
     )
 }
