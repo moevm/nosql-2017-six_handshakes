@@ -3,8 +3,8 @@ package com.eltech.sh.beans;
 import java.util.List;
 
 public class GraphBean {
-    List<Node> nodes;
-    List<Edge> edges;
+    private List<Node> nodes;
+    private List<Edge> edges;
 
     public GraphBean(List<Node> nodes, List<Edge> edges) {
         this.nodes = nodes;
