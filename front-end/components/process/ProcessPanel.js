@@ -49,12 +49,12 @@ class ProcessPanel extends React.Component {
                         <div className={`icon-button`}
                              onClick={() => console.log('download csv')}>
                             <i className="fa fa-download"/>
-                            Try again
+                            Export CSV
                         </div>
                         <div className={`icon-button`}
                              onClick={reset}>
                             <i className="fa fa-repeat"/>
-                            Export CSV
+                            Try again
                         </div>
                     </div>
                 </div>
