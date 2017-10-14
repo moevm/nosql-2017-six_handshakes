@@ -1,44 +1,18 @@
 package com.eltech.sh.beans;
 
+import com.eltech.sh.enums.Nodes;
+
 public class Node {
     private int id;
     private String label;
     private String image;
-    private Integer x;
-    private Integer y;
-    private Integer borderWidth;
+    private Nodes nodeType;
 
-    public Node(int id, String label, String image, Integer x, Integer y, Integer borderWidth) {
+    public Node(int id, String label, String image, Nodes nodeType) {
         this.id = id;
         this.label = label;
         this.image = image;
-        this.x = x;
-        this.y = y;
-        this.borderWidth = borderWidth;
-    }
-
-    public Integer getX() {
-        return x;
-    }
-
-    public void setX(Integer x) {
-        this.x = x;
-    }
-
-    public Integer getY() {
-        return y;
-    }
-
-    public void setY(Integer y) {
-        this.y = y;
-    }
-
-    public Integer getBorderWidth() {
-        return borderWidth;
-    }
-
-    public void setBorderWidth(Integer borderWidth) {
-        this.borderWidth = borderWidth;
+        this.nodeType = nodeType;
     }
 
     public int getId() {
@@ -63,5 +37,13 @@ public class Node {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public Nodes getNodeType() {
+        return nodeType;
+    }
+
+    public void setNodeType(Nodes nodeType) {
+        this.nodeType = nodeType;
     }
 }

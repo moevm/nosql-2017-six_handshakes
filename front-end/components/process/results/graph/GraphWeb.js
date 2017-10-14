@@ -39,13 +39,52 @@ const events = {
 
 export default class GraphWeb extends React.Component {
     render() {
+
         const {graph} = this.props.data;
+        console.log('graph wothiut formating', graph);
+        let  formattedGraph;
+        if(graph){
+            const formattedNodes = Array.from(graph.nodes, node => {
+                let x,y,borderWidth;
+                switch (node.nodeType) {
+                    case 'START_NODE':
+                        x = -350;
+                        y = 0;
+                        borderWidth = 10;
+                        break;
+                    case 'REGULAR_NODE':
+                        x = null;
+                        y = null;
+                        borderWidth = 0;
+                        break;
+                    case 'END_NODE':
+                        x = 350;
+                        y = 0;
+                        borderWidth = 10;
+                        break;
+                }
+                return {
+                    id: node.id,
+                    label: node.label,
+                    image: node.image,
+                    x,
+                    y,
+                    borderWidth
+                }
+            });
+
+            formattedGraph = Object.assign({}, graph, {nodes: formattedNodes});
+            console.log('formatted graph', formattedGraph);
+            console.log('json fro', JSON.stringify(formattedGraph))
+        }
+
+
         return (
             <div>
                 {graph && <Graph
                     options={options}
                     events={events}
-                    graph={graph}
+                    graph={formattedGraph}
                     style={{height: '400px'}}
                 />}
             </div>
