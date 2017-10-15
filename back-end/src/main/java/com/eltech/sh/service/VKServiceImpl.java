@@ -65,9 +65,7 @@ public class VKServiceImpl implements VKService{
             } catch (ApiTooManyException e) {
                 try {
                     Thread.sleep(400);
-                } catch (InterruptedException e1) {
-                    // e1.printStackTrace();
-                }
+                } catch (InterruptedException e1) { }
             } catch (ApiException | ClientException e) {
                 System.out.println("Reset request [getPersonByStringId]");
             }
@@ -83,9 +81,7 @@ public class VKServiceImpl implements VKService{
             JsonNode jsonNode = objectMapper.readTree(response).path("response").path("items");
             return objectMapper.convertValue(jsonNode, new TypeReference<List<Integer>>() {
             });
-        } catch (ClientException | IOException e) {
-            //  e.printStackTrace();
-        }
+        } catch (ClientException | IOException e) { }
         return null;
     }
 
@@ -116,9 +112,7 @@ public class VKServiceImpl implements VKService{
             JsonNode jsonNode = objectMapper.readTree(response).path("response");
             return objectMapper.convertValue(jsonNode, new TypeReference<List<Person>>() {
             });
-        } catch (ClientException | IOException e) {
-            // e.printStackTrace();
-        }
+        } catch (ClientException | IOException e) {        }
 
         return null;
     }

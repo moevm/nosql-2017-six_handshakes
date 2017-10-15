@@ -12,7 +12,8 @@ spring:
 vk:
   app_id: 6183857
   client_secret: wtXph7bLCsrEiakszeKj
-
+server:
+  port: ${PORT:8090}
 logging:
   file: application.log
   pattern:

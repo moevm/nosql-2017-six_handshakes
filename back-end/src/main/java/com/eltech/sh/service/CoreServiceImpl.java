@@ -88,61 +88,10 @@ public class CoreServiceImpl implements CoreService {
 
         for (int i = 0; i < 3; i++) {
             messageService.notify("Started iteration # " + (i + 1));
-            currentLevelIds.clear();
+            doSearch(visited, currentLevelIds, nextLevelIds, toVisit, userFriendsMap);
+            saveFriends(currentUserID, userFriendsMap);
 
-            while (!toVisit.isEmpty()) {
-                messageService.notify("People to check: " + toVisit.size());
-
-                Integer currentID = toVisit.poll();
-                currentLevelIds.add(currentID);
-                visited.add(currentID);
-
-                if (currentLevelIds.size() == 24) {
-                    timerService.startTimer(Timers.VK_TIMER);
-                    Map<Integer, List<Integer>> map = findFriendsForGivenPeople(currentLevelIds);
-                    timerService.suspendTimer(Timers.VK_TIMER);
-
-                    userFriendsMap.putAll(map);
-                    for (Integer id : getFriendsList(map)) {
-                        if (!visited.contains(id)) {
-                            nextLevelIds.add(id);
-                        }
-                    }
-                    currentLevelIds.clear();
-                }
-            }
-            if (currentLevelIds.size() != 0) {
-                timerService.startTimer(Timers.VK_TIMER);
-                Map<Integer, List<Integer>> map = findFriendsForGivenPeople(currentLevelIds);
-                timerService.suspendTimer(Timers.VK_TIMER);
-
-                userFriendsMap.putAll(map);
-                for (Integer id : getFriendsList(map)) {
-                    if (!visited.contains(id)) {
-                        nextLevelIds.add(id);
-                    }
-                }
-                currentLevelIds.clear();
-            }
-
-            toVisit.addAll(nextLevelIds);
-            nextLevelIds.clear();
-
-            timerService.startTimer(Timers.CSV_TIMER);
-            messageService.notify("Saving friends");
-            csvService.saveToSeparateFile(userFriendsMap, String.valueOf(currentUserID));
-            timerService.suspendTimer(Timers.CSV_TIMER);
-
-            timerService.startTimer(Timers.DB_TIMER);
-            messageService.notify("Migrate friends to database");
-            dbService.migrateToDB(currentUserID);
-            timerService.suspendTimer(Timers.DB_TIMER);
-
-            timerService.startTimer(Timers.CSV_TIMER);
-            userFriendsMap.clear();
-            timerService.suspendTimer(Timers.CSV_TIMER);
-
-            messageService.notify("Finding path");
+            messageService.notify("Searching for path");
             timerService.startTimer(Timers.PATH_TIMER);
             List<Integer> nodeIds = dbService.findPathByQuery(from, to, currentUserID);
             timerService.suspendTimer(Timers.PATH_TIMER);
@@ -163,6 +112,66 @@ public class CoreServiceImpl implements CoreService {
         return dbService.findPathByQuery(from, to, currentUserID);
     }
 
+    private void saveFriends(Integer currentUserID, Map<Integer, List<Integer>> userFriendsMap) {
+        timerService.startTimer(Timers.CSV_TIMER);
+        messageService.notify("Saving friends");
+        csvService.saveToSeparateFile(userFriendsMap, String.valueOf(currentUserID));
+        timerService.suspendTimer(Timers.CSV_TIMER);
+        timerService.startTimer(Timers.DB_TIMER);
+        messageService.notify("Migrate friends to database");
+        dbService.migrateToDB(currentUserID);
+        timerService.suspendTimer(Timers.DB_TIMER);
+        timerService.startTimer(Timers.CSV_TIMER);
+        userFriendsMap.clear();
+        timerService.suspendTimer(Timers.CSV_TIMER);
+    }
+
+    private void doSearch(Set<Integer> visited,
+                          List<Integer> currentLevelIds,
+                          Queue<Integer> nextLevelIds,
+                          Queue<Integer> toVisit,
+                          Map<Integer, List<Integer>> userFriendsMap) {
+
+        currentLevelIds.clear();
+
+        while (!toVisit.isEmpty()) {
+            messageService.notify("People to check: " + toVisit.size());
+
+            Integer currentID = toVisit.poll();
+            currentLevelIds.add(currentID);
+            visited.add(currentID);
+
+            if (currentLevelIds.size() == 24) {
+                timerService.startTimer(Timers.VK_TIMER);
+                Map<Integer, List<Integer>> map = findFriendsForGivenPeople(currentLevelIds);
+                timerService.suspendTimer(Timers.VK_TIMER);
+
+                userFriendsMap.putAll(map);
+                for (Integer id : getFriendsList(map)) {
+                    if (!visited.contains(id)) {
+                        nextLevelIds.add(id);
+                    }
+                }
+                currentLevelIds.clear();
+            }
+        }
+        if (currentLevelIds.size() != 0) {
+            timerService.startTimer(Timers.VK_TIMER);
+            Map<Integer, List<Integer>> map = findFriendsForGivenPeople(currentLevelIds);
+            timerService.suspendTimer(Timers.VK_TIMER);
+
+            userFriendsMap.putAll(map);
+            for (Integer id : getFriendsList(map)) {
+                if (!visited.contains(id)) {
+                    nextLevelIds.add(id);
+                }
+            }
+            currentLevelIds.clear();
+        }
+
+        toVisit.addAll(nextLevelIds);
+        nextLevelIds.clear();
+    }
 
     private Map<Integer, List<Integer>> findFriendsForGivenPeople(List<Integer> userIds) {
         messageService.notify("Requesting friends");
