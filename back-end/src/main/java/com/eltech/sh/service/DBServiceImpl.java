@@ -26,15 +26,15 @@ public class DBServiceImpl implements DBService {
 
     @Override
     public void migrateToDB(Integer curUser) {
-        session.run("CREATE CONSTRAINT ON (person:Person) ASSERT person.clusterId IS UNIQUE");
+        session.run("CREATE CONSTRAINT ON (person:Person) ASSERT person.constraintId IS UNIQUE");
 
         session.run("LOAD CSV FROM 'http://localhost:8080/csv/'+{curUser} AS line\n" +
                         "MERGE (from:Person { vkId: toInt(line[0]), " +
-                        "clusterId: toString(line[0]) + toString({curUser}), " +
-                        "owner:{curUser}})\n" +
+                        "constraintId: toString(line[0]) + toString({curUser}), " +
+                        "cluster:{curUser}})\n" +
                         "MERGE (to:Person { vkId: toInt(line[1]), " +
-                        "clusterId: toString(line[1])+ toString({curUser}), " +
-                        "owner:{curUser}})\n" +
+                        "constraintId: toString(line[1])+ toString({curUser}), " +
+                        "cluster:{curUser}})\n" +
                         "MERGE ((from)-[:FRIEND]-(to))",
                 parameters("curUser", curUser));
     }
@@ -44,8 +44,8 @@ public class DBServiceImpl implements DBService {
 
         StatementResult result = session.run(
                 "MATCH (" +
-                        "from:Person {clusterId:toString({from}) + toString({curUser})})," +
-                        "(to:Person {clusterId:toString({to}) + toString({curUser})}), " +
+                        "from:Person {constraintId:toString({from}) + toString({curUser})})," +
+                        "(to:Person {constraintId:toString({to}) + toString({curUser})}), " +
                         "path = shortestPath((from)-[:FRIEND*..5]-(to)) " +
                         "RETURN path",
                 parameters("from", from, "to", to, "curUser", curUser));
@@ -62,8 +62,8 @@ public class DBServiceImpl implements DBService {
     public Pair<List<Edge>, List<Integer>> findWebByQuery(Integer from, Integer to, Integer curUser) {
         StatementResult result = session.run(
                 "MATCH (" +
-                        "from:Person {clusterId:toString({from}) + toString({curUser})})," +
-                        "(to:Person {clusterId:toString({to}) + toString({curUser})}), " +
+                        "from:Person {constraintId:toString({from}) + toString({curUser})})," +
+                        "(to:Person {constraintId:toString({to}) + toString({curUser})}), " +
                         "path = allShortestPaths((from)-[:FRIEND*..5]-(to)) " +
                         "RETURN path",
                 parameters("from", from, "to", to, "curUser", curUser));
@@ -88,7 +88,7 @@ public class DBServiceImpl implements DBService {
     @Override
     public Integer countPeople(Integer user) {
         StatementResult result = session.run(
-                "MATCH (person: Person) where person.owner={curUser} RETURN count (person)",
+                "MATCH (person: Person) where person.cluster={curUser} RETURN count (person)",
                 parameters("curUser", user));
 
         return result.single().get(0).asInt();
@@ -96,7 +96,7 @@ public class DBServiceImpl implements DBService {
 
     @Override
     public void deleteCluster(Integer user) {
-        session.run("MATCH (person:Person) where person.owner={curUser} DETACH DELETE person",
+        session.run("MATCH (person:Person) where person.cluster={curUser} DETACH DELETE person",
                 parameters("curUser", user));
     }
 }

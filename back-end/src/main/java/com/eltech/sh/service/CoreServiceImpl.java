@@ -44,10 +44,10 @@ public class CoreServiceImpl implements CoreService {
         Integer origFromId = vkService.getPersonIntegerIdByStringId(fromId);
         Integer origToId = vkService.getPersonIntegerIdByStringId(toId);
         Integer origCurrentUserId = vkService.getPersonIntegerIdByStringId(currentUserId);
+        checkSixHandshakes(origFromId, origToId, origCurrentUserId);
 
         //TODO remove peopleChecked
         ResponseBean info = new ResponseBean(
-                checkSixHandshakes(origFromId, origToId, origCurrentUserId),
                 findAllPaths(origFromId, origToId, origCurrentUserId),
                 timerService.getTimers(),
                 0,
