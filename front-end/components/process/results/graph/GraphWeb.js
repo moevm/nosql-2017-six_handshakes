@@ -21,7 +21,7 @@ const options = {
     },
     nodes: {
         color: {
-            border: '#6cd0ff'
+            border: '#507299'
         },
         shape: 'circularImage',
         brokenImage: 'http://memepedia.ru/wp-content/uploads/2016/03/ffc073891b259c.jpg',
