@@ -13,7 +13,7 @@ export class ChartPanel extends React.Component {
                 {name: `Downloading data from VK - ${formatTime(vkTime)}s`, value: vkTime, fill: '#507299'},
                 {name: `Saving data to DB - ${formatTime(dbTime)}s`, value: dbTime, fill: '#b1c0d8'},
                 {name: `Working with CSV - ${formatTime(csvTime)}s`, value: csvTime, fill: '#d8ac45'},
-                {name: `Finding path - ${formatTime(pathTime)}s`, value: pathTime, fill: '#d80950'}];
+                {name: `Searching for path - ${formatTime(pathTime)}s`, value: pathTime, fill: '#d80950'}];
 
             const style = {
                 right: 0,

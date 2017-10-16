@@ -1,21 +1,17 @@
 package com.eltech.sh.beans;
 
-import com.eltech.sh.model.Person;
-
-import java.util.List;
-
 public class ResponseBean {
     private GraphBean graph;
     private TimeBean timeStat;
-    private Integer peopleChecked;
+    private Integer pathLength;
     private Integer currentWeb;
 
 
-    public ResponseBean(GraphBean graph, TimeBean timeStat, Integer peopleChecked, Integer currentWeb) {
+    public ResponseBean(GraphBean graph, TimeBean timeStat, Integer pathLength, Integer currentWeb) {
 
         this.graph = graph;
         this.timeStat = timeStat;
-        this.peopleChecked = peopleChecked;
+        this.pathLength = pathLength;
         this.currentWeb = currentWeb;
     }
 
@@ -35,12 +31,12 @@ public class ResponseBean {
         this.timeStat = timeStat;
     }
 
-    public Integer getPeopleChecked() {
-        return peopleChecked;
+    public Integer getPathLength() {
+        return pathLength;
     }
 
-    public void setPeopleChecked(Integer peopleChecked) {
-        this.peopleChecked = peopleChecked;
+    public void setPathLength(Integer pathLength) {
+        this.pathLength = pathLength;
     }
 
     public Integer getCurrentWeb() {

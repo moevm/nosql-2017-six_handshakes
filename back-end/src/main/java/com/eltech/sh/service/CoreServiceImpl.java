@@ -50,7 +50,6 @@ public class CoreServiceImpl implements CoreService {
         ResponseBean info = new ResponseBean(
                 findAllPaths(origFromId, origToId, origCurrentUserId),
                 timerService.getTimers(),
-                //length of path
                 length,
                 dbService.countPeople(origCurrentUserId)
         );
