@@ -4,6 +4,7 @@ import {handleFormSubmit} from "../../actions/SearchActions";
 import "./Form.css"
 import {connect} from "react-redux";
 
+//TODO  show server errors too
 const validate = values => {
     const errors = {};
     const {from, to} = values;

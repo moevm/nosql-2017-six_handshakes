@@ -17,6 +17,7 @@ class ProcessPanel extends React.Component {
         let content;
         switch (activeTab) {
             case 'GRAPH':
+                //TODO show message if dataset empty
                 content = <GraphWeb data={result}/>;
                 break;
             case 'STAT':
