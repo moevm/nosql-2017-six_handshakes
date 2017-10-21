@@ -19,11 +19,13 @@ import javax.xml.bind.ValidationException;
 @RestController
 public class PersonController {
 
+    private final RequestValidator requestValidator;
     private final CoreService coreService;
 
     @Autowired
-    public PersonController(CoreService coreService) {
+    public PersonController(CoreService coreService, RequestValidator requestValidator) {
         this.coreService = coreService;
+        this.requestValidator = requestValidator;
     }
 
     @GetMapping("/me")
@@ -35,10 +37,12 @@ public class PersonController {
     @GetMapping("/find")
     public ResponseBean checkSixHandshakes(@RequestParam("from") String fromId, @RequestParam("to") String toId, HttpServletRequest request) {
         String currentUserId = (String) request.getSession().getAttribute("current_user_id");
+        requestValidator.ifIdValid(fromId);
+        requestValidator.ifIdValid(toId);
         return coreService.run(fromId, toId, currentUserId);
     }
 
-    @ExceptionHandler({ValidationException.class, NullPointerException.class})
+    @ExceptionHandler({ValidationException.class, IllegalArgumentException.class})
     public ResponseEntity<String> handleValidationException(Exception e) {
         return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
