@@ -8,7 +8,7 @@ import App from "./components/App";
 import Stomp from 'stompjs';
 import SockJS from 'sockjs-client';
 import {setSearchState, setSocketState} from "./actions/SocketActions";
-import { loadingBarMiddleware } from 'react-redux-loading-bar'
+import {loadingBarMiddleware} from 'react-redux-loading-bar'
 
 let store = createStore(
     rootReducer,

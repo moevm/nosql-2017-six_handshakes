@@ -9,6 +9,7 @@ import com.vk.api.sdk.actions.Friends;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.UserActor;
 import com.vk.api.sdk.exceptions.ApiException;
+import com.vk.api.sdk.exceptions.ApiParamUserIdException;
 import com.vk.api.sdk.exceptions.ApiTooManyException;
 import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.objects.UserAuthResponse;
@@ -59,13 +60,23 @@ public class VKServiceImpl implements VKService{
         while (true) {
             try {
                 UserXtrCounters user = vkApiClient.users().get(getUserActor())
-                        .userIds(id).unsafeParam("fields", "photo_400_orig").execute().get(0);
+                        .userIds(id)
+                        .unsafeParam("fields", "photo_400_orig")
+                        .execute()
+                        .get(0);
                 System.out.println(user);
-                return new Person(user.getId(), user.getFirstName(), user.getLastName(), user.getPhoto400Orig());
+                return new Person(
+                        user.getId(),
+                        user.getFirstName(),
+                        user.getLastName(),
+                        user.getPhoto400Orig());
             } catch (ApiTooManyException e) {
                 try {
                     Thread.sleep(400);
-                } catch (InterruptedException e1) { }
+                } catch (InterruptedException e1) {
+                }
+            }catch (ApiParamUserIdException e){
+                return null;
             } catch (ApiException | ClientException e) {
                 System.out.println("Reset request [getPersonByStringId]");
             }
@@ -75,9 +86,11 @@ public class VKServiceImpl implements VKService{
     @Override
     public List<Integer> findIdsOfPersonFriends(Integer id) {
         try {
-            String response = friends.get(getUserActor()).listId(id)
+            String response = friends.get(getUserActor())
+                    .listId(id)
                     .unsafeParam("user_id", id)
-                    .executeAsRaw().getContent();
+                    .executeAsRaw()
+                    .getContent();
             JsonNode jsonNode = objectMapper.readTree(response).path("response").path("items");
             return objectMapper.convertValue(jsonNode, new TypeReference<List<Integer>>() {
             });
@@ -89,7 +102,11 @@ public class VKServiceImpl implements VKService{
     public String getUserImgUrl(Integer userId) {
         while (true) {
             try {
-                List<UserXtrCounters> list = vkApiClient.users().get(getUserActor()).unsafeParam("user_id", userId).unsafeParam("fields", "photo_400_orig").execute();
+                List<UserXtrCounters> list = vkApiClient.users()
+                        .get(getUserActor())
+                        .unsafeParam("user_id", userId)
+                        .unsafeParam("fields", "photo_400_orig")
+                        .execute();
                 return list.get(0).getPhoto400Orig();
             } catch (ApiTooManyException e) {
                 try {
@@ -105,9 +122,16 @@ public class VKServiceImpl implements VKService{
 
     @Override
     public List<Person> getPersonsByIds(List<Integer> ids) {
-        List<String> formattedIds = ids.stream().map(Object::toString).collect(Collectors.toList());
+        List<String> formattedIds = ids.stream()
+                .map(Object::toString)
+                .collect(Collectors.toList());
         try {
-            String response = vkApiClient.users().get(getUserActor()).userIds(formattedIds).unsafeParam("fields", "photo_400_orig").executeAsRaw().getContent();
+            String response = vkApiClient.users()
+                    .get(getUserActor())
+                    .userIds(formattedIds)
+                    .unsafeParam("fields", "photo_400_orig")
+                    .executeAsRaw()
+                    .getContent();
 
             JsonNode jsonNode = objectMapper.readTree(response).path("response");
             return objectMapper.convertValue(jsonNode, new TypeReference<List<Person>>() {

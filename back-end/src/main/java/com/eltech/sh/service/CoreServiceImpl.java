@@ -46,11 +46,9 @@ public class CoreServiceImpl implements CoreService {
         Integer origCurrentUserId = vkService.getPersonIntegerIdByStringId(currentUserId);
         Integer length = checkSixHandshakes(origFromId, origToId, origCurrentUserId).size();
 
-        //TODO remove peopleChecked
         ResponseBean info = new ResponseBean(
                 findAllPaths(origFromId, origToId, origCurrentUserId),
                 timerService.getTimers(),
-                //length of path
                 length,
                 dbService.countPeople(origCurrentUserId)
         );

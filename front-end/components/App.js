@@ -33,7 +33,13 @@ class App extends React.Component {
     renderContent() {
         const {socket, loading, connected, result} = this.props;
         if (connected && loading || result.graph) {
-            return (<ProcessPanel socket={socket} loading={loading} result={result}/>)
+            return (
+                <ProcessPanel
+                    socket={socket}
+                    loading={loading}
+                    result={result}
+                />
+            )
         } else {
             return (<Form socket={socket}/>)
         }
