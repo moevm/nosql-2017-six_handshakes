@@ -39,6 +39,7 @@ public class PersonController {
         String currentUserId = (String) request.getSession().getAttribute("current_user_id");
         requestValidator.ifIdValid(fromId);
         requestValidator.ifIdValid(toId);
+        requestValidator.ifIdsNotSame(fromId, toId);
         return coreService.run(fromId, toId, currentUserId);
     }
 
