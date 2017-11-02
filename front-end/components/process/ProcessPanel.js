@@ -37,7 +37,7 @@ class ProcessPanel extends React.Component {
 
     renderTabs() {
         const {activeTab} = this.state;
-        const {result: {graph}, reset} = this.props;
+        const {result: {graph, exportURL}, reset} = this.props;
         if (graph) {
             return (
                 <div className="nav">
@@ -47,11 +47,10 @@ class ProcessPanel extends React.Component {
                         {this.renderTab('DETAILS', activeTab === 'DETAILS', 'fa-ellipsis-h')}
                     </div>
                     <div className="buttons">
-                        <div className={`icon-button`}
-                             onClick={() => console.log('download csv')}>
+                        <a className={`icon-button`} href={exportURL}>
                             <i className="fa fa-download"/>
                             Export CSV
-                        </div>
+                        </a>
                         <div className={`icon-button`}
                              onClick={reset}>
                             <i className="fa fa-repeat"/>
@@ -103,7 +102,7 @@ class ProcessPanel extends React.Component {
 
 
 export default connect(
-   null,
+    null,
     dispatch => ({
         reset: () => dispatch(resetSearchResults())
     })

@@ -32,6 +32,10 @@ body, #root, #root > div {
     height: inherit;
 }
 
+a{
+    text-decoration: none;
+}
+
 .main-wrapper {
     height: calc(100% - 50px);
     padding: 50px 5% 0 5%;

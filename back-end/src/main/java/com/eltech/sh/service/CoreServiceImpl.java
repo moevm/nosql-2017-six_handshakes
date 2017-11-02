@@ -50,7 +50,8 @@ public class CoreServiceImpl implements CoreService {
                 findAllPaths(origFromId, origToId, origCurrentUserId),
                 timerService.getTimers(),
                 length,
-                dbService.countPeople(origCurrentUserId)
+                dbService.countPeople(origCurrentUserId),
+                "/csv/" + String.valueOf(origCurrentUserId)
         );
 
         dbService.deleteCluster(origCurrentUserId);
@@ -98,7 +99,6 @@ public class CoreServiceImpl implements CoreService {
             if (!nodeIds.isEmpty()) {
                 messageService.notify("Path is found");
                 timerService.startTimer(Timers.CSV_TIMER);
-                csvService.deleteCSV(String.valueOf(currentUserID));
                 timerService.suspendTimer(Timers.CSV_TIMER);
                 return nodeIds;
             } else {

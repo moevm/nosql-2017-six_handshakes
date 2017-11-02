@@ -19,6 +19,7 @@ public class CSVServiceImpl implements CSVService {
     @Override
     public void saveToSeparateFile(Map<Integer, List<Integer>> map, String userID) {
         createFolder();
+        deleteCSV(userID);
         FileWriter fileWriter = null;
         CSVPrinter csvFilePrinter = null;
         CSVFormat csvFileFormat = CSVFormat.DEFAULT.withRecordSeparator(NEW_LINE_SEPARATOR);
