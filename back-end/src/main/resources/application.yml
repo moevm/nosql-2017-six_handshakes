@@ -8,10 +8,20 @@ spring:
     serialization:
       indent_output: true
 
-#TODO Fix token problem
+app:
+  url: http://localhost:8080
+
 vk:
   app_id: 6183857
   client_secret: wtXph7bLCsrEiakszeKj
+
+neo4j:
+  uri: bolt://localhost:7687
+  username: neo4j
+  password: root
+
+core:
+  partitionSize: 24
 
 logging:
   file: application.log
