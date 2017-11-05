@@ -5,7 +5,6 @@ import com.eltech.sh.model.Person;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vk.api.sdk.actions.Friends;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.UserActor;
 import com.vk.api.sdk.exceptions.ApiException;
@@ -34,18 +33,15 @@ public class VKServiceImpl implements VKService{
     private final HttpSession session;
     private final VkCredentialsConfiguration configuration;
     private final VkApiClient vkApiClient;
-    private final Friends friends;
     private final ObjectMapper objectMapper;
 
     @Autowired
     public VKServiceImpl(VkCredentialsConfiguration configuration,
                          VkApiClient vkApiClient,
-                         Friends friends,
                          ObjectMapper objectMapper,
                          HttpSession session) {
         this.configuration = configuration;
         this.vkApiClient = vkApiClient;
-        this.friends = friends;
         this.objectMapper = objectMapper;
         this.session = session;
     }
@@ -84,43 +80,6 @@ public class VKServiceImpl implements VKService{
     }
 
     @Override
-    public List<Integer> findIdsOfPersonFriends(Integer id) {
-        try {
-            String response = friends.get(getUserActor())
-                    .listId(id)
-                    .unsafeParam("user_id", id)
-                    .executeAsRaw()
-                    .getContent();
-            JsonNode jsonNode = objectMapper.readTree(response).path("response").path("items");
-            return objectMapper.convertValue(jsonNode, new TypeReference<List<Integer>>() {
-            });
-        } catch (ClientException | IOException e) { }
-        return null;
-    }
-
-    @Override
-    public String getUserImgUrl(Integer userId) {
-        while (true) {
-            try {
-                List<UserXtrCounters> list = vkApiClient.users()
-                        .get(getUserActor())
-                        .unsafeParam("user_id", userId)
-                        .unsafeParam("fields", "photo_400_orig")
-                        .execute();
-                return list.get(0).getPhoto400Orig();
-            } catch (ApiTooManyException e) {
-                try {
-                    Thread.sleep(400);
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
-            } catch (ApiException | ClientException e) {
-                System.out.println("Reset request [getUserImgUrl]");
-            }
-        }
-    }
-
-    @Override
     public List<Person> getPersonsByIds(List<Integer> ids) {
         List<String> formattedIds = ids.stream()
                 .map(Object::toString)
@@ -143,8 +102,7 @@ public class VKServiceImpl implements VKService{
 
     @Override
     public UserAuthResponse getAuthInfo(String code) {
-
-        UserAuthResponse authResponse = null;
+        UserAuthResponse authResponse;
         while (true) {
             try {
                 authResponse = vkApiClient.oauth()
