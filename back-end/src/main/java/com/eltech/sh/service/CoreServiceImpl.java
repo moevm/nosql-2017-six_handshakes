@@ -1,15 +1,18 @@
 package com.eltech.sh.service;
 
 import com.eltech.sh.beans.Edge;
-import com.eltech.sh.beans.GraphBean;
+import com.eltech.sh.beans.Graph;
 import com.eltech.sh.beans.Node;
 import com.eltech.sh.beans.ResponseBean;
 import com.eltech.sh.enums.Timers;
 import com.eltech.sh.model.Person;
 import com.eltech.sh.utils.NodeUtils;
 import javafx.util.Pair;
+import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,6 +25,9 @@ public class CoreServiceImpl implements CoreService {
     private final TimerService timerService;
     private final CSVService csvService;
     private final DBService dbService;
+
+    @Value("${core.partitionSize}")
+    private Integer partitionSize;
 
     @Autowired
     public CoreServiceImpl(
@@ -38,149 +44,113 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
+    public Person getPersonByStringId(String id) {
+        return vkService.getPersonByStringId(id);
+    }
+
+    @Override
     public ResponseBean run(String fromId, String toId, String currentUserId) {
+        validateIds(fromId, toId);
+
+        //FIXME check how it works with multiple users
         timerService.init();
 
         Integer origFromId = vkService.getPersonIntegerIdByStringId(fromId);
         Integer origToId = vkService.getPersonIntegerIdByStringId(toId);
         Integer origCurrentUserId = vkService.getPersonIntegerIdByStringId(currentUserId);
-        Integer length = checkSixHandshakes(origFromId, origToId, origCurrentUserId).size();
 
-        ResponseBean info = new ResponseBean(
-                findAllPaths(origFromId, origToId, origCurrentUserId),
-                timerService.getTimers(),
-                length,
-                dbService.countPeople(origCurrentUserId),
-                "/csv/" + String.valueOf(origCurrentUserId)
-        );
+        ResponseBean response = runBidirectionalSearch(origFromId, origToId, origCurrentUserId);
 
+        //TODO add saving all DB cluster to CSV ?
         dbService.deleteCluster(origCurrentUserId);
-        return info;
+        return response;
     }
 
-    @Override
-    public Person getPersonByStringId(String id) {
-        return vkService.getPersonByStringId(id);
-    }
-
-    private List<Person> checkSixHandshakes(Integer from, Integer to, Integer currentUserID) {
-        List<Integer> nodeIds = findPath(from, to, currentUserID);
-        return vkService.getPersonsByIds(nodeIds);
-    }
-
-    private GraphBean findAllPaths(Integer fromID, Integer toID, Integer currentUserID) {
-        Pair<List<Edge>, List<Integer>> graphData = dbService.findWebByQuery(fromID, toID, currentUserID);
-        List<Person> people = vkService.getPersonsByIds(graphData.getValue());
-
-        List<Node> nodes = NodeUtils.getNodesByPeople(people, fromID, toID);
-        return new GraphBean(nodes, graphData.getKey());
-    }
-
-    private List<Integer> findPath(Integer from, Integer to, Integer currentUserID) {
-        Map<Integer, List<Integer>> userFriendsMap = new HashMap<>();
+    private ResponseBean runBidirectionalSearch(Integer from, Integer to, Integer currentUserID) {
         Set<Integer> visited = new HashSet<>(1000);
         Queue<Integer> toVisit = new LinkedList<>();
         toVisit.add(from);
         toVisit.add(to);
 
-        List<Integer> currentLevelIds = new ArrayList<>();
-        Queue<Integer> nextLevelIds = new LinkedList<>();
-
         for (int i = 0; i < 3; i++) {
             messageService.notify("Started iteration # " + (i + 1));
-            doSearch(visited, currentLevelIds, nextLevelIds, toVisit, userFriendsMap);
-            saveFriends(currentUserID, userFriendsMap);
+            Boolean isPathExist = singleIteration(visited, toVisit, from, to, currentUserID);
 
-            messageService.notify("Searching for path");
-            timerService.startTimer(Timers.PATH_TIMER);
-            List<Integer> nodeIds = dbService.findPathByQuery(from, to, currentUserID);
-            timerService.suspendTimer(Timers.PATH_TIMER);
-
-            if (!nodeIds.isEmpty()) {
+            if (isPathExist) {
                 messageService.notify("Path is found");
-                timerService.startTimer(Timers.CSV_TIMER);
-                timerService.suspendTimer(Timers.CSV_TIMER);
-                return nodeIds;
+
+                Pair<List<Edge>, List<Integer>> graphData = dbService.findWebByQuery(from, to, currentUserID);
+                List<Person> people = vkService.getPersonsByIds(graphData.getValue());
+                List<Node> nodes = NodeUtils.getNodesByPeople(people, from, to);
+                Graph graph = new Graph(nodes, graphData.getKey());
+
+                return new ResponseBean(
+                        graph,
+                        timerService.getTimers(),
+                        people.size(),
+                        dbService.countPeople(currentUserID),
+                        "/csv/" + String.valueOf(currentUserID)
+                );
             } else {
                 messageService.notify("There is no path yet");
-                timerService.startTimer(Timers.CSV_TIMER);
-                csvService.deleteCSV(String.valueOf(currentUserID));
-                timerService.suspendTimer(Timers.CSV_TIMER);
             }
         }
-        return dbService.findPathByQuery(from, to, currentUserID);
+        messageService.notify("No path found");
+        return null;
     }
 
-    private void saveFriends(Integer currentUserID, Map<Integer, List<Integer>> userFriendsMap) {
-        timerService.startTimer(Timers.CSV_TIMER);
-        messageService.notify("Saving friends");
-        csvService.saveToSeparateFile(userFriendsMap, String.valueOf(currentUserID));
-        timerService.suspendTimer(Timers.CSV_TIMER);
-        timerService.startTimer(Timers.DB_TIMER);
-        messageService.notify("Migrate friends to database");
-        dbService.migrateToDB(currentUserID);
-        timerService.suspendTimer(Timers.DB_TIMER);
-        timerService.startTimer(Timers.CSV_TIMER);
-        userFriendsMap.clear();
-        timerService.suspendTimer(Timers.CSV_TIMER);
-    }
+    private Boolean singleIteration(Set<Integer> visited,
+                                    Queue<Integer> toVisit,
+                                    Integer from,
+                                    Integer to,
+                                    Integer currentUserID) {
+        List<List<Integer>> batches = ListUtils.partition(new ArrayList<>(toVisit), partitionSize);
+        visited.addAll(toVisit);
+        toVisit.clear();
 
-    private void doSearch(Set<Integer> visited,
-                          List<Integer> currentLevelIds,
-                          Queue<Integer> nextLevelIds,
-                          Queue<Integer> toVisit,
-                          Map<Integer, List<Integer>> userFriendsMap) {
+        Map<Integer, List<Integer>> userFriendsMap = new HashMap<>();
 
-        currentLevelIds.clear();
-
-        while (!toVisit.isEmpty()) {
-            messageService.notify("People to check: " + toVisit.size());
-
-            Integer currentID = toVisit.poll();
-            currentLevelIds.add(currentID);
-            visited.add(currentID);
-
-            if (currentLevelIds.size() == 24) {
-                timerService.startTimer(Timers.VK_TIMER);
-                Map<Integer, List<Integer>> map = findFriendsForGivenPeople(currentLevelIds);
-                timerService.suspendTimer(Timers.VK_TIMER);
-
-                userFriendsMap.putAll(map);
-                for (Integer id : getFriendsList(map)) {
-                    if (!visited.contains(id)) {
-                        nextLevelIds.add(id);
-                    }
-                }
-                currentLevelIds.clear();
-            }
-        }
-        if (currentLevelIds.size() != 0) {
+        for (List<Integer> batch : batches) {
+            messageService.notify("Requesting friends");
             timerService.startTimer(Timers.VK_TIMER);
-            Map<Integer, List<Integer>> map = findFriendsForGivenPeople(currentLevelIds);
+            Map<Integer, List<Integer>> map = vkService.findFriendsForGivenPeople(batch);
             timerService.suspendTimer(Timers.VK_TIMER);
 
             userFriendsMap.putAll(map);
-            for (Integer id : getFriendsList(map)) {
+            List<Integer> friendsIDs = map.values().stream().flatMap(List::stream).collect(Collectors.toList());
+
+            for (Integer id : friendsIDs) {
                 if (!visited.contains(id)) {
-                    nextLevelIds.add(id);
+                    toVisit.add(id);
                 }
             }
-            currentLevelIds.clear();
         }
 
-        toVisit.addAll(nextLevelIds);
-        nextLevelIds.clear();
+        messageService.notify("Saving friends");
+        timerService.startTimer(Timers.CSV_TIMER);
+        csvService.saveToSeparateFile(userFriendsMap, String.valueOf(currentUserID));
+        timerService.suspendTimer(Timers.CSV_TIMER);
+
+        messageService.notify("Migrate friends to database");
+        timerService.startTimer(Timers.DB_TIMER);
+        dbService.migrateToDB(currentUserID);
+        timerService.suspendTimer(Timers.DB_TIMER);
+
+        messageService.notify("Searching for path");
+        timerService.startTimer(Timers.PATH_TIMER);
+        Boolean isPathExist = dbService.isPathExist(from, to, currentUserID);
+        timerService.suspendTimer(Timers.PATH_TIMER);
+
+        timerService.startTimer(Timers.CSV_TIMER);
+        csvService.deleteCSV(String.valueOf(currentUserID));
+        timerService.suspendTimer(Timers.CSV_TIMER);
+
+        return isPathExist;
     }
 
-    private Map<Integer, List<Integer>> findFriendsForGivenPeople(List<Integer> userIds) {
-        messageService.notify("Requesting friends");
-        return vkService.findFriendsForGivenPeople(userIds);
-    }
-
-    private List<Integer> getFriendsList(Map<Integer, List<Integer>> map) {
-        Collection<List<Integer>> values = map.values();
-        return values.stream()
-                .flatMap(List::stream)
-                .collect(Collectors.toList());
+    private void validateIds(String fromId, String toId) {
+        Assert.isTrue(!fromId.equals(toId), "Ids should't be the same");
+        Assert.notNull(vkService.getPersonByStringId(fromId), String.format("User with id %s is not exist", fromId));
+        Assert.notNull(vkService.getPersonByStringId(toId), String.format("User with id %s is not exist", toId));
     }
 }
