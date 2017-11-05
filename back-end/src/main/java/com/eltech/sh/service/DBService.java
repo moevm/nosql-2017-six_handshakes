@@ -10,6 +10,8 @@ public interface DBService {
 
     List<Integer> findPathByQuery(Integer from, Integer to, Integer curUser);
 
+    Boolean isPathExist (Integer from, Integer to, Integer curUser);
+
     Pair<List<Edge>, List<Integer>> findWebByQuery(Integer from, Integer to, Integer curUser);
 
     Integer countPeople(Integer user);

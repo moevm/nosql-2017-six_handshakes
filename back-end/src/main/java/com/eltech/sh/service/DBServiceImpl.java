@@ -19,6 +19,9 @@ import static org.neo4j.driver.v1.Values.parameters;
 public class DBServiceImpl implements DBService {
     private final Session session;
 
+    @org.springframework.beans.factory.annotation.Value("${app.url}")
+    private String url;
+
     @Autowired
     public DBServiceImpl(Session session) {
         this.session = session;
@@ -28,7 +31,7 @@ public class DBServiceImpl implements DBService {
     public void migrateToDB(Integer curUser) {
         session.run("CREATE CONSTRAINT ON (person:Person) ASSERT person.constraintId IS UNIQUE");
 
-        session.run("LOAD CSV FROM 'http://localhost:8080/csv/'+{curUser} AS line\n" +
+        session.run("LOAD CSV FROM '" + url + "/csv/'+{curUser} AS line\n" +
                         "MERGE (from:Person { vkId: toInt(line[0]), " +
                         "constraintId: toString(line[0]) + toString({curUser}), " +
                         "cluster:{curUser}})\n" +
@@ -98,5 +101,11 @@ public class DBServiceImpl implements DBService {
     public void deleteCluster(Integer user) {
         session.run("MATCH (person:Person) where person.cluster={curUser} DETACH DELETE person",
                 parameters("curUser", user));
+    }
+
+    @Override
+    public Boolean isPathExist(Integer from, Integer to, Integer curUser) {
+        //FIXME execute direct query instead of it
+        return findPathByQuery(from, to ,curUser).size() > 0;
     }
 }
