@@ -25,7 +25,7 @@ function fetchWrapper(url, params, dispatch, onSuccess, onFailure) {
             }
         )
         .then(json => dispatch(onSuccess(json)))
-        .catch(error => dispatch(onFailure(`An error occurred. ${error.message}`)));
+        .catch(error => dispatch(onFailure(error)));
 }
 
 export function fetchGet(url, dispatch, onSuccess, onFailure) {
