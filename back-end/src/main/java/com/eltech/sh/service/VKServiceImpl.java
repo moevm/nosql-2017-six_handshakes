@@ -22,13 +22,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class VKServiceImpl implements VKService{
+public class VKServiceImpl implements VKService {
 
     private final HttpSession session;
     private final VkCredentialsConfiguration configuration;
@@ -71,7 +72,7 @@ public class VKServiceImpl implements VKService{
                     Thread.sleep(400);
                 } catch (InterruptedException e1) {
                 }
-            }catch (ApiParamUserIdException e){
+            } catch (ApiParamUserIdException e) {
                 return null;
             } catch (ApiException | ClientException e) {
                 System.out.println("Reset request [getPersonByStringId]");
@@ -95,7 +96,8 @@ public class VKServiceImpl implements VKService{
             JsonNode jsonNode = objectMapper.readTree(response).path("response");
             return objectMapper.convertValue(jsonNode, new TypeReference<List<Person>>() {
             });
-        } catch (ClientException | IOException e) {        }
+        } catch (ClientException | IOException e) {
+        }
 
         return null;
     }
@@ -147,17 +149,20 @@ public class VKServiceImpl implements VKService{
             Map<Integer, List<Integer>> resultMap = new HashMap<>();
 
             int i = 0;
+            List<Integer> userFriendsIds;
             for (JsonNode node : responseNode) {
                 if (node.size() > 0) {
-                    List<Integer> userFriendsIds = objectMapper.convertValue(
+                    userFriendsIds = objectMapper.convertValue(
                             node.findValue("items"),
                             new TypeReference<List<Integer>>() {
                             }
                     );
-
-                    resultMap.put(userIds.get(i), userFriendsIds);
-                    i++;
+                } else {
+                    userFriendsIds = new ArrayList<>();
                 }
+
+                resultMap.put(userIds.get(i), userFriendsIds);
+                i++;
             }
             return resultMap;
         } catch (ClientException | IOException e) {
