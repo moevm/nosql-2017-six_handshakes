@@ -4,7 +4,7 @@ import com.eltech.sh.beans.TimeBean;
 import com.eltech.sh.enums.Timers;
 import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.stereotype.Service;
-
+//TODO prototype scope
 @Service
 public class TimerServiceImpl implements TimerService {
 

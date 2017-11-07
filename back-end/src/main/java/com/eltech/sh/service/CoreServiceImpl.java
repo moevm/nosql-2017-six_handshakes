@@ -83,7 +83,7 @@ public class CoreServiceImpl implements CoreService {
                 List<Person> people = vkService.getPersonsByIds(graphData.getValue());
                 List<Node> nodes = NodeUtils.getNodesByPeople(people, from, to);
                 Graph graph = new Graph(nodes, graphData.getKey());
-
+//FIXME wrong path length calculation - people.size() = total amount of result graph's nodes instead of path length
                 return new ResponseBean(
                         graph,
                         timerService.getTimers(),
