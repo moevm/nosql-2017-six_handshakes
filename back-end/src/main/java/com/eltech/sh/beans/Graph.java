@@ -2,11 +2,11 @@ package com.eltech.sh.beans;
 
 import java.util.List;
 
-public class GraphBean {
+public class Graph {
     private List<Node> nodes;
     private List<Edge> edges;
 
-    public GraphBean(List<Node> nodes, List<Edge> edges) {
+    public Graph(List<Node> nodes, List<Edge> edges) {
         this.nodes = nodes;
         this.edges = edges;
     }

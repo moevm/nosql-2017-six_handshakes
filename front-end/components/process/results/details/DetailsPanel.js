@@ -9,8 +9,8 @@ export class DetailsPanel extends React.Component {
                 <div className="details-panel">
                     <h1>Details</h1>
                     <div className="numbers">
-                        <div><i className="fa fa-2x fa-male icon"/> Path length: {pathLength}</div>
-                        <div><i className="fa fa-2x fa-male icon"/> Total in database: {currentWeb}</div>
+                        <div>Path length: {pathLength}</div>
+                        <div>Total persons in database: {currentWeb}</div>
                     </div>
                 </div>
             )

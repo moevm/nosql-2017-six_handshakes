@@ -1,14 +1,14 @@
 package com.eltech.sh.beans;
 
 public class ResponseBean {
-    private GraphBean graph;
+    private Graph graph;
     private TimeBean timeStat;
     private Integer pathLength;
     private Integer currentWeb;
     private String exportURL;
 
 
-    public ResponseBean(GraphBean graph, TimeBean timeStat, Integer pathLength, Integer currentWeb, String exportURL) {
+    public ResponseBean(Graph graph, TimeBean timeStat, Integer pathLength, Integer currentWeb, String exportURL) {
         this.graph = graph;
         this.timeStat = timeStat;
         this.pathLength = pathLength;
@@ -16,11 +16,11 @@ public class ResponseBean {
         this.exportURL = exportURL;
     }
 
-    public GraphBean getGraph() {
+    public Graph getGraph() {
         return graph;
     }
 
-    public void setGraph(GraphBean graph) {
+    public void setGraph(Graph graph) {
         this.graph = graph;
     }
 

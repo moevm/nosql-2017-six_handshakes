@@ -31,8 +31,6 @@ public class AccessTokenFilter extends GenericFilterBean {
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         HttpSession session = httpServletRequest.getSession();
 
-        String url = httpServletRequest.getRequestURL().toString();
-
         if (session.getAttribute("access_token") == null) {
             httpServletResponse.sendRedirect(configuration.getOAuthUrl());
         } else {

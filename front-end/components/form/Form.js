@@ -19,31 +19,16 @@ const validate = values => {
 
 let Form = props => {
     console.log(props);
-    const {errors, handleSubmit, socket: {socketState}, setDataSource, formValues: {dataSource, from, to}} = props;
+    const {formErrors, handleSubmit, socket: {socketState}, formValues: {from, to}, error} = props;
 
-    let errorMessage = (errors) ? errors.from : '';
+    let errorMessage = (formErrors) ? formErrors.from : '';
+    if(error) errorMessage = error;
     if (socketState !== 'CONNECTED') errorMessage = 'Connecting to server...';
 
-    const vkDataSource = dataSource === 'VK';
-    const fileDataSource = dataSource === 'FILE';
 
     return (
         <div>
             <form className="main-form content-wrapper" onSubmit={handleSubmit}>
-                <h3>Choose data source</h3>
-                <div className="row">
-                    <div className={`icon-button vk ${vkDataSource ? 'active' : ''}`}
-                         onClick={() => setDataSource('VK')}>
-                        <i className="fa fa-vk "/>
-                        vkontakte
-                    </div>
-                    <div className={`icon-button ${fileDataSource ? 'active' : ''}`}
-                         onClick={() => setDataSource('FILE')}>
-                        <i className="fa fa-upload"/>
-                        your data
-                    </div>
-                </div>
-
                 <h3>Enter IDs</h3>
                 <div className="row">
                     <Field name="from" component="input" type="text" placeholder="from"/>
@@ -60,19 +45,11 @@ let Form = props => {
     )
 };
 
-/*
- <div className={`file-input ${fileDataSource ? 'active' : ''}`}>
- {fileDataSource && <Field name="csv" component="input" type="file"/>}
- </div>
- */
 
 Form = connect(
     state => ({
         formValues: state.form.mainForm.values,
-        errors: state.form.mainForm.syncErrors
-    }),
-    dispatch => ({
-        setDataSource: (value) => dispatch(change('mainForm', 'dataSource', value))
+        formErrors: state.form.mainForm.syncErrors
     })
 )(Form);
 
@@ -81,9 +58,7 @@ Form = reduxForm({
     onSubmit: handleFormSubmit,
     initialValues: {
         from: '',
-        to: '',
-        dataSource: 'VK',
-        // csv: undefined
+        to: ''
     },
     validate
 })(Form);

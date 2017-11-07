@@ -11,10 +11,6 @@ public interface VKService {
 
     Person getPersonByStringId(String id);
 
-    List<Integer> findIdsOfPersonFriends(Integer id);
-
-    String getUserImgUrl(Integer userId);
-
     List<Person> getPersonsByIds(List<Integer> ids);
 
     Integer getPersonIntegerIdByStringId(String userId);
