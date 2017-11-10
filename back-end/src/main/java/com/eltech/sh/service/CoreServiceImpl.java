@@ -149,6 +149,7 @@ public class CoreServiceImpl implements CoreService {
     }
 
     private void validateIds(String fromId, String toId) {
+        messageService.notify("Validating IDs");
         Assert.isTrue(!fromId.equals(toId), "Ids should't be the same");
         Assert.notNull(vkService.getPersonByStringId(fromId), String.format("User with id %s is not exist", fromId));
         Assert.notNull(vkService.getPersonByStringId(toId), String.format("User with id %s is not exist", toId));
