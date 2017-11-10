@@ -61,7 +61,6 @@ public class CoreServiceImpl implements CoreService {
 
         ResponseBean response = runBidirectionalSearch(origFromId, origToId, origCurrentUserId);
 
-        //TODO add saving all DB cluster to CSV ?
         dbService.deleteCluster(origCurrentUserId);
         return response;
     }
@@ -88,8 +87,7 @@ public class CoreServiceImpl implements CoreService {
                         graph,
                         timerService.getTimers(),
                         people.size(),
-                        dbService.countPeople(currentUserID),
-                        "/csv/" + String.valueOf(currentUserID)
+                        dbService.countPeople(currentUserID)
                 );
             } else {
                 messageService.notify("There is no path yet");
@@ -149,8 +147,9 @@ public class CoreServiceImpl implements CoreService {
     }
 
     private void validateIds(String fromId, String toId) {
-        Assert.isTrue(!fromId.equals(toId), "Ids should't be the same");
-        Assert.notNull(vkService.getPersonByStringId(fromId), String.format("User with id %s is not exist", fromId));
-        Assert.notNull(vkService.getPersonByStringId(toId), String.format("User with id %s is not exist", toId));
+        messageService.notify("Validating IDs");
+        Assert.isTrue(!fromId.equals(toId), "Ids shouldn't be the same");
+        Assert.notNull(vkService.getPersonByStringId(fromId), String.format("User with ID %s doesn't exist", fromId));
+        Assert.notNull(vkService.getPersonByStringId(toId), String.format("User with ID %s doesn't exist", toId));
     }
 }

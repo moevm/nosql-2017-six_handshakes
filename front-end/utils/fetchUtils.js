@@ -15,12 +15,13 @@ function fetchWrapper(url, params, dispatch, onSuccess, onFailure) {
     return fetch(url, params)
         .then(
             response => {
-                if(response.status === 200) {
+                if (response.status === 200) {
                     return response.json();
                 }
                 else {
-                    let errorMessage = `\nCode ${response.status}: ${response.statusText}\n${response.url}`;
-                    throw new Error(errorMessage);
+                    return response.text().then(value => {
+                        throw new Error(value);
+                    })
                 }
             }
         )

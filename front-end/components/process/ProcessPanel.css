@@ -48,13 +48,9 @@
 }
 
 .process-panel .content {
-    height: 0;
-    transition: all .50s ease;
-}
-
-.process-panel .content.active {
     height: 400px;
     margin-bottom: 30px;
+    transition: all .50s ease;
 }
 
 .process-panel .tabs {
@@ -80,6 +76,15 @@
     color: #567592;
 }
 
+.process-panel .tabs.disabled div:hover {
+    cursor: default;
+    color: #797f85;
+}
+
+.process-panel .tabs.disabled div.active {
+    color: #797f85;
+}
+
 .process-panel .nav {
     display: flex;
     flex-direction: row;
@@ -93,4 +98,8 @@
 
 .nav .buttons div {
     margin-left: 5px;
+}
+.empty-result-message{
+    padding: 40px;
+    color: #797f85;
 }

@@ -4,69 +4,62 @@ import {ChartPanel} from "./results/chart/ChartPanel";
 import {DetailsPanel} from "./results/details/DetailsPanel";
 import "./ProcessPanel.css"
 import {connect} from "react-redux";
-import {resetSearchResults} from "../../actions/SearchActions";
+import {resetApp} from "../../ducks/app";
+import {getHasResult, getIsEmptyResult} from "../../ducks/result";
+
+const GRAPH = 'PROCESS_PANEL/GRAPH_TAB';
+const STAT = 'PROCESS_PANEL/STAT_TAB';
+const DETAILS = 'PROCESS_PANEL/DETAILS_TAB';
+
 class ProcessPanel extends React.Component {
     constructor() {
         super();
-        this.state = {showLog: false, activeTab: 'GRAPH'}
+        this.state = {showLog: false, activeTab: GRAPH}
     }
 
     renderContent() {
         const {activeTab} = this.state;
-        const {result} = this.props;
+        const {result, isEmptyResult} = this.props;
         let content;
-        switch (activeTab) {
-            case 'GRAPH':
-                //TODO show message if dataset empty
-                content = <GraphWeb data={result}/>;
-                break;
-            case 'STAT':
-                content = <ChartPanel data={result}/>;
-                break;
-            case 'DETAILS':
-                content = <DetailsPanel data={result}/>;
-                break;
+        if(isEmptyResult){
+            content = <div className="empty-result-message"><h2>There are no chain :(</h2></div>
+        } else {
+            switch (activeTab) {
+                case GRAPH:
+                    content = <GraphWeb data={result}/>;
+                    break;
+                case STAT:
+                    content = <ChartPanel data={result}/>;
+                    break;
+                case DETAILS:
+                    content = <DetailsPanel data={result}/>;
+                    break;
+            }
         }
+        return (<div className='content'>{content}</div>);
+    }
 
+    renderTabs() {
+        const {resetApp, isEmptyResult} = this.props;
         return (
-            <div className={`content ${result.graph ? 'active' : ''}`}>
-                {content}
+            <div className="nav">
+                <div className={`tabs ${isEmptyResult ? 'disabled' : ''}`}>
+                    {this.renderTab(GRAPH, 'fa-link')}
+                    {this.renderTab(STAT, 'fa-pie-chart')}
+                    {this.renderTab(DETAILS, 'fa-ellipsis-h')}
+                </div>
+                <div className="buttons">
+                    <div className={`icon-button`} onClick={resetApp}>
+                        <i className="fa fa-repeat"/> Try again
+                    </div>
+                </div>
             </div>
         );
     }
 
-    renderTabs() {
-        const {activeTab} = this.state;
-        const {result: {graph, exportURL}, reset} = this.props;
-        if (graph) {
-            return (
-                <div className="nav">
-                    <div className="tabs">
-                        {this.renderTab('GRAPH', activeTab === 'GRAPH', 'fa-link')}
-                        {this.renderTab('STAT', activeTab === 'STAT', 'fa-pie-chart')}
-                        {this.renderTab('DETAILS', activeTab === 'DETAILS', 'fa-ellipsis-h')}
-                    </div>
-                    <div className="buttons">
-                        <a className={`icon-button`} href={exportURL}>
-                            <i className="fa fa-download"/>
-                            Export CSV
-                        </a>
-                        <div className={`icon-button`}
-                             onClick={reset}>
-                            <i className="fa fa-repeat"/>
-                            Try again
-                        </div>
-                    </div>
-                </div>
-            );
-        } else {
-            return <div/>;
-        }
-    }
-
-    renderTab(tabName, isActive, faClass) {
+    renderTab(tabName, faClass) {
         return (
-            <div className={`${isActive ? 'active' : ''}`}
+            <div className={`${this.state.activeTab === tabName ? 'active' : ''}`}
                  onClick={() => this.setState({activeTab: tabName})}>
                 <i className={`fa ${faClass} fa-2x`}/>
             </div>
@@ -74,19 +67,19 @@ class ProcessPanel extends React.Component {
     }
 
     render() {
+        const {messageSocket: {messages}, loading} = this.props;
+
         const {showLog} = this.state;
-        const {socket: {searchState}, loading} = this.props;
-
-        const list = searchState.map((item, index) => <p key={index}>{item}</p>);
-
+        const list = messages.map((item, index) => <p key={index}>{item}</p>);
         const stateIconClassName = (loading) ? `fa fa-cog fa-2x fa-spin fa-fw` : `fa fa-check fa-2x`;
+
         return (
             <div className="content-wrapper process-panel">
-                {this.renderTabs()}
-                {this.renderContent()}
+                {!loading && this.renderTabs()}
+                {!loading && this.renderContent()}
                 <div className="loader">
                     <div>
-                        <i className={stateIconClassName}/>{searchState[searchState.length - 1]}
+                        <i className={stateIconClassName}/>{messages[messages.length - 1]}
                     </div>
                     <div className={`show-log-button`} onClick={() => this.setState({showLog: !showLog})}>
                         <i className={`fa fa-caret-down fa-2x ${showLog ? 'active' : ''}`}/>
@@ -102,8 +95,13 @@ class ProcessPanel extends React.Component {
 
 
 export default connect(
-    null,
+    state => ({
+        result: state.result,
+        isEmptyResult: getIsEmptyResult(state),
+        messageSocket: state.messageSocket,
+        loading: state.loadingBar !== 0,
+    }),
     dispatch => ({
-        reset: () => dispatch(resetSearchResults())
+        resetApp: () => dispatch(resetApp())
     })
 )(ProcessPanel);

@@ -1,8 +1,9 @@
 import React from "react";
 import {reduxForm, Field, change} from 'redux-form';
-import {handleFormSubmit} from "../../actions/SearchActions";
 import "./Form.css"
 import {connect} from "react-redux";
+import {handleFormSubmit} from "../../ducks/app";
+import {getIsConnected} from "../../ducks/messageSocket";
 
 //TODO  show server errors too
 const validate = values => {
@@ -18,12 +19,12 @@ const validate = values => {
 
 
 let Form = props => {
-    console.log(props);
-    const {formErrors, handleSubmit, socket: {socketState}, formValues: {from, to}, error} = props;
+    console.log('FORM PROPS', props);
+    const {formErrors, handleSubmit, connected, formValues: {from, to}, error} = props;
 
     let errorMessage = (formErrors) ? formErrors.from : '';
     if(error) errorMessage = error;
-    if (socketState !== 'CONNECTED') errorMessage = 'Connecting to server...';
+    if (!connected) errorMessage = 'Connecting to server...';
 
 
     return (
@@ -49,7 +50,8 @@ let Form = props => {
 Form = connect(
     state => ({
         formValues: state.form.mainForm.values,
-        formErrors: state.form.mainForm.syncErrors
+        formErrors: state.form.mainForm.syncErrors,
+        connected: getIsConnected(state)
     })
 )(Form);
 

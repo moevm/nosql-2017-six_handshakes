@@ -5,15 +5,13 @@ public class ResponseBean {
     private TimeBean timeStat;
     private Integer pathLength;
     private Integer currentWeb;
-    private String exportURL;
 
 
-    public ResponseBean(Graph graph, TimeBean timeStat, Integer pathLength, Integer currentWeb, String exportURL) {
+    public ResponseBean(Graph graph, TimeBean timeStat, Integer pathLength, Integer currentWeb) {
         this.graph = graph;
         this.timeStat = timeStat;
         this.pathLength = pathLength;
         this.currentWeb = currentWeb;
-        this.exportURL = exportURL;
     }
 
     public Graph getGraph() {
@@ -46,13 +44,5 @@ public class ResponseBean {
 
     public void setCurrentWeb(Integer currentWeb) {
         this.currentWeb = currentWeb;
-    }
-
-    public String getExportURL() {
-        return exportURL;
-    }
-
-    public void setExportURL(String exportURL) {
-        this.exportURL = exportURL;
     }
 }
