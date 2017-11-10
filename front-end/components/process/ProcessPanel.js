@@ -5,7 +5,7 @@ import {DetailsPanel} from "./results/details/DetailsPanel";
 import "./ProcessPanel.css"
 import {connect} from "react-redux";
 import {resetApp} from "../../ducks/app";
-import {getHasResult} from "../../ducks/result";
+import {getHasResult, getIsEmptyResult} from "../../ducks/result";
 
 const GRAPH = 'PROCESS_PANEL/GRAPH_TAB';
 const STAT = 'PROCESS_PANEL/STAT_TAB';
@@ -19,28 +19,31 @@ class ProcessPanel extends React.Component {
 
     renderContent() {
         const {activeTab} = this.state;
-        const {result} = this.props;
+        const {result, isEmptyResult} = this.props;
         let content;
-        switch (activeTab) {
-            case GRAPH:
-                //TODO show message if dataset empty
-                content = <GraphWeb data={result}/>;
-                break;
-            case STAT:
-                content = <ChartPanel data={result}/>;
-                break;
-            case DETAILS:
-                content = <DetailsPanel data={result}/>;
-                break;
+        if(isEmptyResult){
+            content = <div className="empty-result-message"><h2>There are no chain :(</h2></div>
+        } else {
+            switch (activeTab) {
+                case GRAPH:
+                    content = <GraphWeb data={result}/>;
+                    break;
+                case STAT:
+                    content = <ChartPanel data={result}/>;
+                    break;
+                case DETAILS:
+                    content = <DetailsPanel data={result}/>;
+                    break;
+            }
         }
         return (<div className='content'>{content}</div>);
     }
 
     renderTabs() {
-        const {resetApp} = this.props;
+        const {resetApp, isEmptyResult} = this.props;
         return (
             <div className="nav">
-                <div className="tabs">
+                <div className={`tabs ${isEmptyResult ? 'disabled' : ''}`}>
                     {this.renderTab(GRAPH, 'fa-link')}
                     {this.renderTab(STAT, 'fa-pie-chart')}
                     {this.renderTab(DETAILS, 'fa-ellipsis-h')}
@@ -94,6 +97,7 @@ class ProcessPanel extends React.Component {
 export default connect(
     state => ({
         result: state.result,
+        isEmptyResult: getIsEmptyResult(state),
         messageSocket: state.messageSocket,
         loading: state.loadingBar !== 0,
     }),

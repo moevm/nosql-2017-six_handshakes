@@ -34,7 +34,6 @@ const fetchSearchSuccess = json => dispatch => {
 const fetchResultFailure = error => dispatch => {
     dispatch({type: FETCH_RESULT_FAILURE});
     throw new SubmissionError({
-        // username: 'User does not exist',
         _error: error.message
     })
 };
@@ -51,3 +50,4 @@ export const fetchResult = (values, dispatch) => {
 };
 
 export const getHasResult = (state) => state.result !== null;
+export const getIsEmptyResult = (state) => getHasResult(state) && (state.result.graph.nodes.length === 0);
