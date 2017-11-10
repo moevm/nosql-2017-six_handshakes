@@ -1,5 +1,6 @@
 import {SERVER_URL} from "../constants/constants";
 import {fetchGet} from "../utils/fetchUtils";
+import {SubmissionError} from 'redux-form';
 
 const SET_RESULT = 'RESULT/SET_RESULT';
 const CLEAR_RESULT = 'RESULT/CLEAR_RESULT';
@@ -30,15 +31,23 @@ const fetchSearchSuccess = json => dispatch => {
     dispatch(setResult(json));
 };
 
+const fetchResultFailure = error => dispatch => {
+    dispatch({type: FETCH_RESULT_FAILURE});
+    throw new SubmissionError({
+        // username: 'User does not exist',
+        _error: error.message
+    })
+};
+
 
 export const fetchResult = (values, dispatch) => {
     dispatch(fetchResultRequest());
-    fetchGet(
+    return fetchGet(
         `${SERVER_URL}/find?from=${values.from}&to=${values.to}`,
         dispatch,
         fetchSearchSuccess,
-        (error) => console.log('RESULT ERROR', error)
+        fetchResultFailure
     );
 };
 
-export const getHasResult = (state) => state.result !== null ;
+export const getHasResult = (state) => state.result !== null;

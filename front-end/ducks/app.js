@@ -3,7 +3,7 @@ import {clearResult, fetchResult} from "./result";
 import {reset} from "redux-form";
 
 export const handleFormSubmit = (values, dispatch, props) => {
-    fetchResult(values, dispatch);
+    return fetchResult(values, dispatch);
 };
 
 export const resetApp = () => dispatch => {

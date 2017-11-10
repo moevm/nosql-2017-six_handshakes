@@ -20,7 +20,6 @@ class App extends React.Component {
 
     render() {
         const {user, showProcessPanel} = this.props;
-        console.log('SHOW RESULT', showProcessPanel);
         return (
             <div>
                 <Header user={user}/>
