@@ -87,8 +87,7 @@ public class CoreServiceImpl implements CoreService {
                         graph,
                         timerService.getTimers(),
                         people.size(),
-                        dbService.countPeople(currentUserID),
-                        "/csv/" + String.valueOf(currentUserID)
+                        dbService.countPeople(currentUserID)
                 );
             } else {
                 messageService.notify("There is no path yet");
