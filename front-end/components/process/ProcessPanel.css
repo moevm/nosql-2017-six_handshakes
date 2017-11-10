@@ -48,13 +48,9 @@
 }
 
 .process-panel .content {
-    height: 0;
-    transition: all .50s ease;
-}
-
-.process-panel .content.active {
     height: 400px;
     margin-bottom: 30px;
+    transition: all .50s ease;
 }
 
 .process-panel .tabs {
