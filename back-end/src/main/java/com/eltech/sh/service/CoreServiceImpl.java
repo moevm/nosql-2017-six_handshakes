@@ -86,7 +86,7 @@ public class CoreServiceImpl implements CoreService {
                 return new ResponseBean(
                         graph,
                         timerService.getTimers(),
-                        people.size(),
+                        dbService.countPathLength(from, to, currentUserID),
                         dbService.countPeople(currentUserID)
                 );
             } else {

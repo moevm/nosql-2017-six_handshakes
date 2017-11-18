@@ -106,6 +106,25 @@ public class DBServiceImpl implements DBService {
     @Override
     public Boolean isPathExist(Integer from, Integer to, Integer curUser) {
         //FIXME execute direct query instead of it
-        return findPathByQuery(from, to ,curUser).size() > 0;
+        StatementResult result = session.run(
+                "MATCH (" +
+                        "from:Person {constraintId:toString({from}) + toString({curUser})})," +
+                        "(to:Person {constraintId:toString({to}) + toString({curUser})}), " +
+                        "path = shortestPath((from)-[:FRIEND*..5]-(to)) " +
+                        "RETURN length(path) > 0",
+                parameters("from", from, "to", to, "curUser", curUser));
+        return result.single().get(0).asBoolean();
+    }
+
+    @Override
+    public int countPathLength(Integer from, Integer to, Integer curUser) {
+        StatementResult result = session.run(
+                "MATCH (" +
+                        "from:Person {constraintId:toString({from}) + toString({curUser})})," +
+                        "(to:Person {constraintId:toString({to}) + toString({curUser})}), " +
+                        "path = shortestPath((from)-[:FRIEND*..5]-(to)) " +
+                        "RETURN length(path)",
+                parameters("from", from, "to", to, "curUser", curUser));
+        return result.single().get(0).asInt();
     }
 }
