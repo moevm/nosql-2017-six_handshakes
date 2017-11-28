@@ -1,12 +1,13 @@
 package com.eltech.sh.service;
 
 import com.eltech.sh.beans.Edge;
-import javafx.util.Pair;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.neo4j.driver.v1.Session;
 import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -84,8 +85,7 @@ public class DBServiceImpl implements DBService {
         for (Long idx : nodes.keySet()) {
             ids.add(nodes.get(idx));
         }
-
-        return new Pair<>(relations, ids);
+        return new ImmutablePair<>(relations, ids);
     }
 
     @Override
@@ -113,7 +113,7 @@ public class DBServiceImpl implements DBService {
                         "path = shortestPath((from)-[:FRIEND*..5]-(to)) " +
                         "RETURN length(path) > 0",
                 parameters("from", from, "to", to, "curUser", curUser));
-        return result.single().get(0).asBoolean();
+        return result.hasNext();
     }
 
     @Override

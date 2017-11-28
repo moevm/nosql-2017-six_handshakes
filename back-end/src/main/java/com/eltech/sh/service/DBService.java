@@ -1,8 +1,7 @@
 package com.eltech.sh.service;
 
 import com.eltech.sh.beans.Edge;
-import javafx.util.Pair;
-
+import org.apache.commons.lang3.tuple.Pair;
 import java.util.List;
 
 public interface DBService {
