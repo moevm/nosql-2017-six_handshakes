@@ -1,9 +1,7 @@
-*/node_modules/*
-*/bundle.js
-*/package-lock.json
-*/.gradle
-*/.idea
-*/build/
-*/gradle-app.setting
-*/.gradletasknamecache
-/back-end/src/main/resources/static/*
+# Created by .ignore support plugin (hsz.mobi)
+.gradle
+.idea
+/build/
+gradle-app.setting
+!gradle-wrapper.jar
+.gradletasknamecache
