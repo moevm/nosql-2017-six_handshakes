@@ -1,0 +1,105 @@
+.process-panel {
+    width: 90%;
+}
+
+.process-panel .loader {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-content: center;
+    color: #797f85;
+}
+
+.process-panel .loader > div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.process-panel .loader div i {
+    margin-right: 5px;
+}
+
+.process-panel .log {
+    margin-top: 20px;
+    padding: 0 20px;
+    height: 0;
+    transition: all .50s ease;
+    text-align: left;
+    overflow-y: scroll;
+    background: rgba(230, 229, 229, 0.5);
+    color: #797f85;
+}
+
+.process-panel .log.active {
+    height: 200px;
+}
+
+.process-panel .show-log-button i {
+    transition: all .60s ease;
+}
+
+.process-panel .show-log-button .active {
+    transform: rotate(180deg);
+}
+
+.process-panel .show-log-button:hover {
+    cursor: pointer;
+}
+
+.process-panel .content {
+    height: 400px;
+    margin-bottom: 30px;
+    transition: all .50s ease;
+}
+
+.process-panel .tabs {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.process-panel .tabs div {
+    color: #797f85;
+    transition: all .10s ease;
+    padding: 5px 30px;
+    background: #e1e1e1;
+    margin-right: 2px;
+}
+
+.process-panel .tabs div:hover {
+    cursor: pointer;
+    color: #567592;
+}
+
+.process-panel .tabs div.active {
+    color: #567592;
+}
+
+.process-panel .tabs.disabled div:hover {
+    cursor: default;
+    color: #797f85;
+}
+
+.process-panel .tabs.disabled div.active {
+    color: #797f85;
+}
+
+.process-panel .nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.nav .buttons {
+    display: flex;
+    flex-direction: row;
+}
+
+.nav .buttons div {
+    margin-left: 5px;
+}
+.empty-result-message{
+    padding: 40px;
+    color: #797f85;
+}
