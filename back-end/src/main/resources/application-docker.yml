@@ -2,7 +2,7 @@ spring:
   data:
     neo4j:
       username: neo4j
-      password: neo4j
+      password: test
 
   jackson:
     serialization:
@@ -18,7 +18,7 @@ vk:
 neo4j:
   uri: bolt://database:7687
   username: neo4j
-  password: neo4j
+  password: test
 
 core:
   partitionSize: 24
