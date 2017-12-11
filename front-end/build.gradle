@@ -1,0 +1,37 @@
+plugins {
+    id "com.moowork.node" version "1.2.0"
+}
+apply plugin: 'java'
+
+group rootProject.group
+project.ext.artifactId = "front"
+version rootProject.version
+
+buildDir = 'dist'
+
+task webjar(type: Jar, dependsOn: 'jar') {
+    from(fileTree('build')) {
+        into 'META-INF/resources'
+    }
+}
+
+clean {
+    delete 'dist'
+    delete 'build'
+}
+
+
+node {
+    version = '6.11.2'
+    npmVersion = '5.0.3'
+    yarnVersion = '1.0.0'
+    distBaseUrl = 'https://nodejs.org/dist'
+    download = true
+    workDir = file("${project.buildDir}/nodejs")
+    npmWorkDir = file("${project.buildDir}/npm")
+    yarnWorkDir = file("${project.buildDir}/yarn")
+    nodeModulesDir = file("${projectDir}/node_modules")
+}
+
+build.finalizedBy(npm_install, npm_run_webpack)
+
