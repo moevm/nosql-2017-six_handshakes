@@ -7,9 +7,9 @@ const options = {
             enabled: false
         }
     },
+    physics: false,
     edges: {
         color: "#000000",
-        physics: false,
         arrows: {
             to: {enabled: false},
             from: {enabled: false}
