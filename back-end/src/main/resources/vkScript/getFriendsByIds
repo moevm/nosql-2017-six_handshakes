@@ -1,5 +1,3 @@
-
-
 var idNum = API.users.get(
 {
 "user_ids":ids,

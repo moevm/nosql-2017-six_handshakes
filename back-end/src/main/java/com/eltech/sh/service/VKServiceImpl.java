@@ -18,10 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -136,7 +133,7 @@ public class VKServiceImpl implements VKService {
     public Map<Integer, List<Integer>> findFriendsForGivenPeople(List<Integer> userIds) {
         String ids = StringUtils.join(userIds, ", ");
         try {
-            String vkScriptCode = readFileCode("src\\main\\vkScript\\getFriendsByIds");
+            String vkScriptCode = readFileCode("/vkScript/getFriendsByIds");
             String response = vkApiClient.execute()
                     .code(
                             getUserActor(),
@@ -172,10 +169,11 @@ public class VKServiceImpl implements VKService {
     }
 
     private String readFileCode(String path) {
+        ClassLoader classLoader = getClass().getClassLoader();
         StringBuilder code = new StringBuilder();
-        File file = new File(path);
 
-        try (BufferedReader in = new BufferedReader(new FileReader(file.getAbsoluteFile()))) {
+        final InputStream resourceAsStream = classLoader.getResourceAsStream(path);
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(resourceAsStream))) {
             String s;
             while ((s = in.readLine()) != null) {
                 code.append(s);

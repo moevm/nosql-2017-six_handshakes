@@ -10,6 +10,8 @@ spring:
 
 app:
   url: http://localhost:8080
+  neo4j:
+    url: http://app:8080
 
 vk:
   app_id: 6183857
