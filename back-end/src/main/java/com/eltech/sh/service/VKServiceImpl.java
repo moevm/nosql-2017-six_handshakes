@@ -133,7 +133,7 @@ public class VKServiceImpl implements VKService {
     public Map<Integer, List<Integer>> findFriendsForGivenPeople(List<Integer> userIds) {
         String ids = StringUtils.join(userIds, ", ");
         try {
-            String vkScriptCode = readFileCode("/vkScript/getFriendsByIds");
+            String vkScriptCode = readFileCode("vkScript/getFriendsByIds");
             String response = vkApiClient.execute()
                     .code(
                             getUserActor(),
