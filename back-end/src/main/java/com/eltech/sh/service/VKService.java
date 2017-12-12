@@ -16,4 +16,6 @@ public interface VKService {
     Integer getPersonIntegerIdByStringId(String userId);
 
     Map<Integer, List<Integer>> findFriendsForGivenPeople(List<Integer> userIds);
+
+    Boolean userHasFriends(Integer id);
 }

@@ -1,9 +1,6 @@
 package com.eltech.sh.service;
 
-import com.eltech.sh.beans.Edge;
-import com.eltech.sh.beans.Graph;
-import com.eltech.sh.beans.Node;
-import com.eltech.sh.beans.ResponseBean;
+import com.eltech.sh.beans.*;
 import com.eltech.sh.enums.Timers;
 import com.eltech.sh.model.Person;
 import com.eltech.sh.utils.NodeUtils;
@@ -66,6 +63,10 @@ public class CoreServiceImpl implements CoreService {
     }
 
     private ResponseBean runBidirectionalSearch(Integer from, Integer to, Integer currentUserID) {
+        if (!(vkService.userHasFriends(from) && vkService.userHasFriends(to))) {
+            return getEmptyResult();
+        }
+
         Set<Integer> visited = new HashSet<>(1000);
         Queue<Integer> toVisit = new LinkedList<>();
         toVisit.add(from);
@@ -82,7 +83,6 @@ public class CoreServiceImpl implements CoreService {
                 List<Person> people = vkService.getPersonsByIds(graphData.getValue());
                 List<Node> nodes = NodeUtils.getNodesByPeople(people, from, to);
                 Graph graph = new Graph(nodes, graphData.getKey());
-//FIXME wrong path length calculation - people.size() = total amount of result graph's nodes instead of path length
                 return new ResponseBean(
                         graph,
                         timerService.getTimers(),
@@ -93,8 +93,16 @@ public class CoreServiceImpl implements CoreService {
                 messageService.notify("There is no path yet");
             }
         }
+        return getEmptyResult();
+    }
+
+    private ResponseBean getEmptyResult() {
         messageService.notify("No path found");
-        return null;
+        return new ResponseBean(
+                new Graph(new ArrayList<>(), new ArrayList<>()),
+                new TimeBean(0L, 0L, 0L, 0L),
+                0, 0
+        );
     }
 
     private Boolean singleIteration(Set<Integer> visited,

@@ -22,7 +22,7 @@ class ProcessPanel extends React.Component {
         const {result, isEmptyResult} = this.props;
         let content;
         if(isEmptyResult){
-            content = <div className="empty-result-message"><h2>There are no chain :(</h2></div>
+            content = <div className="empty-result-message"><h2>There is no chain :(</h2></div>
         } else {
             switch (activeTab) {
                 case GRAPH:

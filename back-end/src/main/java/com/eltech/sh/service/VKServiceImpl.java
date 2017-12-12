@@ -19,10 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -166,6 +163,11 @@ public class VKServiceImpl implements VKService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public Boolean userHasFriends(Integer id) {
+        Map<Integer, List<Integer>> friends = findFriendsForGivenPeople(Collections.singletonList(id));
+        return friends.get(id).size() > 0;
     }
 
     private String readFileCode(String path) {
