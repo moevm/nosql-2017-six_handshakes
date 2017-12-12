@@ -20,7 +20,7 @@ import static org.neo4j.driver.v1.Values.parameters;
 public class DBServiceImpl implements DBService {
     private final Session session;
 
-    @org.springframework.beans.factory.annotation.Value("${app.url}")
+    @org.springframework.beans.factory.annotation.Value("${app.neo4j.url}")
     private String url;
 
     @Autowired
