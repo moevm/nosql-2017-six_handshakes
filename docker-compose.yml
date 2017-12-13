@@ -1,0 +1,14 @@
+version: '2'
+services:
+  database:
+    image: "neo4j:3.3"
+    environment:
+        - NEO4J_AUTH=neo4j/test
+    ports:
+        - "7687:7687"
+        - "7474:7474"
+  app:
+    image: "evnikitina/6shakes:latest"
+    command: ["java", "-Dspring.profiles.active=docker", "-jar", "nosql-2017-six_handshakes/back-end/build/libs/six-handshakes-0.1.jar"]
+    ports:
+     - "8080:8080"
