@@ -27,3 +27,12 @@ password: test
 ``` 
 
 After all this steps you can access application via **localhost:8080**
+
+### Or
+Download ```docker-compose.yml```
+
+```docker pull evnikitina/6shakes```
+
+then run in folder with **docker-compose.yml** ```docker-compose up```
+
+Notice, that you need docker-compose version 2
