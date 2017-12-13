@@ -17,7 +17,6 @@ You need to download Dockerfile and docker-compose.yml.
 run ``` docker build -t "evnikitina/6shakes:latest" <path to Dockerfile>``` 
 
 ### Or
-Download ```docker-compose.yml```
 
 ```docker pull evnikitina/6shakes```
 
