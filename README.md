@@ -15,7 +15,7 @@ change it in **application.yml** file
 You need to download Dockerfile and docker-compose.yml. 
 
 
-run ``` docker build "evnikitina/6shakes:latest" <path to Dockerfile>``` 
+run ``` docker build -t "evnikitina/6shakes:latest" <path to Dockerfile>``` 
 
 then run in folder with **docker-compose.yml** ```docker-compose up```
 
